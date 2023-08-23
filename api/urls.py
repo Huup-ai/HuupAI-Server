@@ -11,4 +11,5 @@ urlpatterns = [
     path('vms/', VMAPI.as_view(), name='vm-list'),
     path('vms/<str:cluster_name>/<str:vm_name>/', VMControlAPI.as_view(), name='vm-detail'),
     path('inventory/', InventoryAPI.as_view(), name='inventory-list-create'),
+    path('inventory/<int:inventory_id>/download-ssh-cert/', DownloadSSHCertView.as_view(), name='download-ssh-cert'),
 ]

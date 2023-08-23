@@ -15,6 +15,9 @@ from rest_framework import status
 from django.contrib.auth import login, logout
 from rest_framework.permissions import IsAuthenticated
 
+from django.http import FileResponse
+from django.shortcuts import get_object_or_404
+
 ###################################   Cluster API   #####################################
 class GetAllCluster(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
@@ -124,3 +127,13 @@ class InventoryAPI(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class DownloadSSHCertView(APIView):
+    def get(self, request, inventory_id):
+        inventory = get_object_or_404(Inventory, pk=inventory_id)
+        ssh_cert = inventory.ssh_cert
+        if ssh_cert:
+            response = FileResponse(ssh_cert, content_type='application/octet-stream')
+            response['Content-Disposition'] = f'attachment; filename="{inventory.inventory_name}.cert"'
+            return response
+        else:
+            return Response({'message': 'SSH certificate not found'}, status=status.HTTP_404_NOT_FOUND)
