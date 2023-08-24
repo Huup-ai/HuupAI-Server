@@ -8,8 +8,8 @@ urlpatterns = [
     path('clusters/', GetAllCluster.as_view(), name='cluster-list'),
     path('clusters/<str:name>/', GetClusterByName.as_view(), name='cluster-detail'),
     path('clusters/status/<str:name>/',GetClusterStat.as_view(), name='cluster-status'),
-    path('vms/', VMAPI.as_view(), name='vm-list'),
-    path('vms/<str:cluster_name>/<str:vm_name>/', VMControlAPI.as_view(), name='vm-detail'),
+    path('instances/', InstanceAPI.as_view(), name='instance-list'),
+    path('instances/<str:cluster_name>/<str:vm_name>/', InstanceControlAPI.as_view(), name='vm-detail'),
     path('inventory/', InventoryAPI.as_view(), name='inventory-list-create'),
     path('inventory/<int:inventory_id>/download-ssh-cert/', DownloadSSHCertView.as_view(), name='download-ssh-cert'),
 ]

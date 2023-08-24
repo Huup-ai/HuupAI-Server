@@ -9,7 +9,7 @@ class Cluster(models.Model):
     region = models.CharField(max_length=100,null=True)
     privacy = models.CharField(max_length=100,null=True)
 
-class VirtualMachine(models.Model):
+class Instance(models.Model):
     cluster = models.ForeignKey(Cluster, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     num_of_cpu = models.IntegerField()

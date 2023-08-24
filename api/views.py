@@ -45,40 +45,40 @@ class GetClusterStat(APIView):
 
 ###################################   VM API    #####################################
 
-class VMAPI(APIView):
+class InstanceAPI(APIView):
     def get(self, request):
-        # vms = VirtualMachine.objects.all()
-        # serializer = VirtualMachineSerializer(vms, many=True)
-        return Response({'VM_list':['vm1','vm2','vm2333']})
+        # vms = Instance.objects.all()
+        # serializer = InstanceSerializer(vms, many=True)
+        return Response({'instance_list':['vm1','vm2','vm2333']})
         #return Response(serializer.data)
 
     def post(self, request):
-        serializer = VirtualMachineSerializer(data=request.data)
+        serializer = InstanceSerializer(data=request.data)
         if serializer.is_valid():
         #     serializer.save()
             return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class VMControlAPI(APIView):
+class InstanceControlAPI(APIView):
     def put(self, request, cluster_name, vm_name):
         # try:
-        #     vm = VirtualMachine.objects.get(cluster__name=cluster_name, name=vm_name)
-        #     serializer = VirtualMachineSerializer(vm, data=request.data)
+        #     vm = Instance.objects.get(cluster__name=cluster_name, name=vm_name)
+        #     serializer = InstanceSerializer(vm, data=request.data)
         #     if serializer.is_valid():
         #         serializer.save()
         #         return Response(serializer.data)
         #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        # except VirtualMachine.DoesNotExist:
+        # except Instance.DoesNotExist:
         #     return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(f'{vm_name} has been successfully updated')
 
     def delete(self, request, cluster_name, vm_name):
         # try:
-        #     vm = VirtualMachine.objects.get(cluster__name=cluster_name, name=vm_name)
+        #     vm = Instance.objects.get(cluster__name=cluster_name, name=vm_name)
         #     vm.delete()
         #     return Response(status=status.HTTP_204_NO_CONTENT)
-        # except VirtualMachine.DoesNotExist:
+        # except Instance.DoesNotExist:
         #     return Response(status=status.HTTP_404_NOT_FOUND)
         return Response('f{vm_name} has been successfully deleted')
     

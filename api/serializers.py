@@ -1,9 +1,9 @@
 from rest_framework import serializers
 from .models import *
 
-class VirtualMachineSerializer(serializers.ModelSerializer):
+class InstanceSerializer(serializers.ModelSerializer):
     class Meta:
-        model = VirtualMachine
+        model = Instance
         fields = '__all__'
 
 class ClusterSerializer(serializers.ModelSerializer):
