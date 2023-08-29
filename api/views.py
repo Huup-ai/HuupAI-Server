@@ -4,7 +4,13 @@ IMPORTANT:
 This is the hard-coded version for internal tests only. Please delete the return statements and 
 use the commented out code for the future use.
 
+The COOKIES IS FOR TEST JUST ONLY
+
 '''
+COOKIES = {'R_SESS':'token-test01:62fwdpv2npks9vb4qbcjstzkrl98m6zc68tqrdmdkrdr4hjmtf98fz'}# DELETE THIS IN PRODUCTION USE
+
+import requests
+from django.http import JsonResponse, HttpResponse
 from rest_framework import generics
 from rest_framework.response import Response
 from .models import *
@@ -19,69 +25,75 @@ from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 
 ###################################   Cluster API   #####################################
-class GetAllCluster(generics.ListAPIView):
-    def list(self, request, *args, **kwargs):
-        queryset = Cluster.objects.all()
-        serializer = ClusterSerializer(queryset, many=True)
-        # return Response(serializer.data)
-        return Response({'Clusters':['us-ca-t4-c1','us-ca-t3-c2','us-wa-t4-c2']})
+def getAllCluster(request):
+    try:
+        res = requests.get('https://edgesphere.szsciit.com/v1/management.cattle.io.clusters',cookies=COOKIES,headers={}, verify=False)
+        if res.headers.get('content-type') == 'application/json':
+                return JsonResponse(res.json())
+        return HttpResponse(res.content, status=res.status_code)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
-class GetClusterByName(generics.RetrieveAPIView):
-    def get(self, requrest, *args,**kwargs):
-    #     queryset = Cluster.objects.get(name = name_arg)
-    #     serializer = ClusterSerializer(queryset)
-    #     return Response(serializer.data)
-        return Response({'name':kwargs['name'],'hour_rate':0.01,'gpu':'1','configuration':'xxx','region':'us-east-2','privacy':'xxx'})
 
-class GetClusterStat(APIView):
-    def get(self, request, name):
-        # try:
-        #     cluster = Cluster.objects.get(name=name)
-        #     serializer = ClusterSerializer(cluster)
-        #     return Response(serializer.data)
-        return Response({'name':f'{name}','status':'running'})
-        # except Cluster.DoesNotExist:
-        #     return Response(status=status.HTTP_404_NOT_FOUND)
+def GetClusterByName(requrest,cluster_id):
+    try:
+        res = requests.get(f"https://edgesphere.szsciit.com/v1/management.cattle.io.clusters/{cluster_id}",cookies=COOKIES,headers={}, verify=False)
+        if res.headers.get('content-type') == 'application/json':
+                return JsonResponse(res.json())
+        return HttpResponse(res.content, status=res.status_code)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 ###################################   VM API    #####################################
-
-class InstanceAPI(APIView):
-    def get(self, request):
-        # vms = Instance.objects.all()
-        # serializer = InstanceSerializer(vms, many=True)
-        return Response({'instance_list':['vm1','vm2','vm2333']})
-        #return Response(serializer.data)
-
-    def post(self, request):
-        serializer = InstanceSerializer(data=request.data)
-        if serializer.is_valid():
-        #     serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+def VMGet(request,cluster_id, vm_name, vm_namespace):
+    json = {'clusterid':cluster_id,'vmName':vm_name,'namespace':vm_namespace}
+    try:
+        res = requests.post(f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/kubevirt.io.virtualmachine/{vm_namespace}/{vm_name}",cookies=COOKIES,json = json, verify=False)
+        if res.headers.get('content-type') == 'application/json':
+                return JsonResponse(res.json())
+        return HttpResponse(res.content, status=res.status_code)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-class InstanceControlAPI(APIView):
-    def put(self, request, cluster_name, vm_name):
-        # try:
-        #     vm = Instance.objects.get(cluster__name=cluster_name, name=vm_name)
-        #     serializer = InstanceSerializer(vm, data=request.data)
-        #     if serializer.is_valid():
-        #         serializer.save()
-        #         return Response(serializer.data)
-        #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        # except Instance.DoesNotExist:
-        #     return Response(status=status.HTTP_404_NOT_FOUND)
-        return Response(f'{vm_name} has been successfully updated')
 
-    def delete(self, request, cluster_name, vm_name):
-        # try:
-        #     vm = Instance.objects.get(cluster__name=cluster_name, name=vm_name)
-        #     vm.delete()
-        #     return Response(status=status.HTTP_204_NO_CONTENT)
-        # except Instance.DoesNotExist:
-        #     return Response(status=status.HTTP_404_NOT_FOUND)
-        return Response('f{vm_name} has been successfully deleted')
+def VMCreate(request,cluster_id):
+    metadata = request.POST['metadata']
+    spec = request.POST['spec']
+    status = request.POST['status']
+    json = {'metadata':metadata,'spec':spec,'status':status}
+    try:
+        res = requests.post(f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/kubevirt.io.virtualmachine",cookies=COOKIES,json = json, verify=False)
+        if res.headers.get('content-type') == 'application/json':
+                return JsonResponse(res.json())
+        return HttpResponse(res.content, status=res.status_code)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+def VMUpdate(request, cluster_id):
+    cluster_id = request.POST['cluster_id']
+    action = request.POST['action']
+    json = {'cluster_id':cluster_id, 'action':action}
+    try:
+        res = requests.post(f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/kubevirt.io.virtualmachine/default/vmName?action={action}",cookies=COOKIES,json = json, verify=False)
+        if res.headers.get('content-type') == 'application/json':
+                return JsonResponse(res.json())
+        return HttpResponse(res.content, status=res.status_code)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
     
+def VMTerminate(request,cluster_id,vm_name,vm_namespace):
+    json = {'clusterid':cluster_id,'vmName':vm_name,'namespace':vm_namespace}
+    try:
+        res = requests.post(f"wss://edgesphere.szsciit.com/wsproxy/k8s/clusters/{cluster_id} /apis/subresources.kubevirt.io/v1/namespaces/{vm_namespace}/virtualmachineinstances/{vm_name}/vnc",cookies=COOKIES,json = json, verify=False)
+        if res.headers.get('content-type') == 'application/json':
+                return JsonResponse(res.json())
+        return HttpResponse(res.content, status=res.status_code)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
 ###################################   USER API    #####################################
 
 class UserRegistrationAPI(APIView):
@@ -94,9 +106,9 @@ class UserRegistrationAPI(APIView):
 
 class UserLoginAPI(APIView):
     def post(self, request):
-        username = request.data.get('username')
+        email = request.data.get('email')  # Change from username to email
         password = request.data.get('password')
-        user = User.objects.filter(username=username).first()
+        user = User.objects.filter(email=email).first()  # Change from username to email
 
         if user and user.check_password(password):
             login(request, user)
