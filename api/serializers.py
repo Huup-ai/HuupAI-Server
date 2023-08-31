@@ -6,11 +6,6 @@ class InstanceSerializer(serializers.ModelSerializer):
         model = Instance
         fields = '__all__'
 
-class ClusterSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Cluster
-        fields = '__all__'
-
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
@@ -29,3 +24,12 @@ class InventorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Inventory
         fields = '__all__'
+
+class VMCreateSerializer(serializers.Serializer):
+    metadata = serializers.JSONField()
+    spec = serializers.JSONField()
+    status = serializers.JSONField()
+
+class VMUpdateSerializer(serializers.Serializer):
+    action = serializers.CharField(required=True, max_length=255)
+    vmName = serializers.CharField(required=True, max_length=255)
