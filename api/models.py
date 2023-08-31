@@ -55,11 +55,3 @@ class Instance(models.Model):
     def __str__(self):
         return f"Instance {self.instance_id}"
     
-
-class Inventory(models.Model):
-    hostname = models.CharField(max_length=100)
-    IP = models.CharField(max_length=15)
-    ssh_cert = models.TextField()
-    status = models.CharField(max_length=50)
-    instance_name = models.ForeignKey(Instance, on_delete=models.CASCADE)
-    inventory_name = models.CharField(max_length=100)

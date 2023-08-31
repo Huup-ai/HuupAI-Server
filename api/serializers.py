@@ -20,10 +20,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
-class InventorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Inventory
-        fields = '__all__'
 
 class VMCreateSerializer(serializers.Serializer):
     metadata = serializers.JSONField()

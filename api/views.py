@@ -22,9 +22,6 @@ from rest_framework.decorators import api_view
 from django.contrib.auth import login, logout
 from rest_framework.permissions import IsAuthenticated
 
-from django.http import FileResponse
-from django.shortcuts import get_object_or_404
-
 ###################################   Cluster API   #####################################
 @api_view(['GET'])
 def getAllCluster(request):
@@ -45,15 +42,39 @@ def GetClusterByName(requrest,cluster_id):
 
 ###################################   VM API    #####################################
 @api_view(['POST'])
-def VMGet(request,cluster_id, vm_name, vm_namespace):
-    json = {'clusterid':cluster_id,'vmName':vm_name,'namespace':vm_namespace}
+def VMGet(request, cluster_id, vm_name, vm_namespace):
+    # Authenticate the user
+    if not request.user.is_authenticated:
+        return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    # Check if the instance is in the database
+    instance = Instance.objects.filter(
+        user_id=request.user,
+        cluster=cluster_id,
+        vm_name=vm_name,
+        vm_namespace=vm_namespace
+    ).first()
+    
+    if not instance:
+        return Response({"error": "Instance not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    # If instance exists, make the API call
+    json = {'clusterid': cluster_id, 'vmName': vm_name, 'namespace': vm_namespace}
     try:
-        res = requests.post(f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/kubevirt.io.virtualmachine/{vm_namespace}/{vm_name}",cookies=COOKIES,json = json, verify=False)
+        res = requests.post(
+            f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/kubevirt.io.virtualmachine/{vm_namespace}/{vm_name}",
+            cookies=COOKIES,
+            json=json,
+            verify=False
+        )
+        
         if res.headers.get('content-type') == 'application/json':
-                return JsonResponse(res.json())
+            return JsonResponse(res.json())
+        
         return HttpResponse(res.content, status=res.status_code)
-    except:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    
+    except requests.RequestException as e:  # Catching specific requests exceptions
+        return Response({"error": str(e)}, status=500)
 
 
 @api_view(['POST'])
@@ -70,24 +91,25 @@ def VMCreate(request,cluster_id):
     spec = serializer.validated_data['spec']
     status_info = serializer.validated_data['status']
     json = {'metadata':metadata,'spec':spec,'status':status_info}
-    # try:
+
+    try:
         #send the requests to the cloud
-    res = requests.post(f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/kubevirt.io.virtualmachine",
-                        cookies=COOKIES,
-                        json = json, 
-                        verify=False)
-    # Try to create the instance
-    record = start_instance(request.user, spec, cluster_id)
-    if record:
-        return Response(res.content, status=res.status_code)
-    else:
-        return JsonResponse({"error": "Can not create the instance"}, status=400)
-    # except:
-    #     return Response(status=status.HTTP_404_NOT_FOUND)
+        res = requests.post(f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/kubevirt.io.virtualmachine",
+                            cookies=COOKIES,
+                            json = json, 
+                            verify=False)
+        # Try to create the instance
+        record = start_instance(request.user, spec, cluster_id)
+        if record:
+            return Response(res.content, status=res.status_code)
+        else:
+            return JsonResponse({"error": "Can not create the instance"}, status=400)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
     
 
 @api_view(['POST'])
-def VMUpdate(request, cluster_id):
+def VMUpdate(request, cluster_id, vm_name, vm_namespace):
     #First check if user is anthenticated
     if not request.user.is_authenticated:
         return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
@@ -98,19 +120,18 @@ def VMUpdate(request, cluster_id):
         return Response(serializer.errors, status=400)
 
     action = serializer.validated_data['action']
-    vmName = serializer.validated_data['vmName']
 
     try:
         res = requests.post(
-            f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/kubevirt.io.virtualmachine/default/{vmName}?action={action}",
+            f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/kubevirt.io.virtualmachine/{vm_namespace}/{vm_name}?action={action}",
             cookies=COOKIES,
-            json={"cluster_id": cluster_id, "action": action},
+            json={"cluster_id": cluster_id, "action": action, "vmName":vm_name, "namespace":vm_namespace},
             verify=False
         )
 
         if res.status_code == 200:  # Assuming 200 is the success status code
             # Retrieve the corresponding instance
-            instance = Instance.objects.get(user_id=request.user, vm_name=vmName)
+            instance = Instance.objects.get(user_id=request.user, vm_name=vm_name)
             
             # Update the instance using the provided function
             update_instance(instance, action)
@@ -120,7 +141,6 @@ def VMUpdate(request, cluster_id):
         return Response({"error": "Instance not found."}, status=status.HTTP_404_NOT_FOUND)
     except requests.RequestException as e:  # Catching specific requests exceptions
         return Response({"error": str(e)}, status=500)
-
 
 @api_view(['POST'])
 def VMTerminate(request, cluster_id, vm_name, vm_namespace):
@@ -187,29 +207,16 @@ class UserLogoutAPI(APIView):
         return Response({'message': 'User logged out successfully'})
     
 ###################################   INVENTORY API    #####################################
-class InventoryAPI(APIView):
-    permission_classes = (IsAuthenticated,)
+@api_view(['GET'])
+def GetSshKey(request, clusterid):
+    if not request.user.is_authenticated:
+        return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
 
-    def get(self, request):
-        user = request.user
-        inventories = Inventory.objects.filter(user=user)
-        serializer = InventorySerializer(inventories, many=True)
-        return Response(serializer.data)
-
-    def post(self, request):
-        serializer = InventorySerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class DownloadSSHCertView(APIView):
-    def get(self, request, inventory_id):
-        inventory = get_object_or_404(Inventory, pk=inventory_id)
-        ssh_cert = inventory.ssh_cert
-        if ssh_cert:
-            response = FileResponse(ssh_cert, content_type='application/octet-stream')
-            response['Content-Disposition'] = f'attachment; filename="{inventory.inventory_name}.cert"'
-            return response
-        else:
-            return Response({'message': 'SSH certificate not found'}, status=status.HTTP_404_NOT_FOUND)
+    try:
+        # Making a GET request to the provided URL
+        res = requests.get(f"https://edgesphere.szsciit.com/k8s/clusters/{clusterid}/v1/cnos.io.sshpublic", cookies=COOKIES, verify=False)
+        
+        # Return the content and status code
+        return HttpResponse(res.content, status=res.status_code)
+    except requests.RequestException as e:  # Catching specific requests exceptions
+        return Response({"error": str(e)}, status=500)

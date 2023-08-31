@@ -14,6 +14,5 @@ urlpatterns = [
     path('VM/<str:cluster_id>/updatevm/',VMUpdate, name = 'vm-update'),
     path('VM/<str:cluster_id>/vmterminate/<str:name_space>/<str:vm_name>/',VMTerminate, name = 'vm-terminate'),
 
-    path('inventory/', InventoryAPI.as_view(), name='inventory-list-create'),
-    path('inventory/<int:inventory_id>/download-ssh-cert/', DownloadSSHCertView.as_view(), name='download-ssh-cert'),
-]
+    path('api/getsshkey/<str:clusterid>/', GetSshKey, name='get-ssh-key'),
+    ]

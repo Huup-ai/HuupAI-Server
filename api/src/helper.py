@@ -13,9 +13,9 @@ def start_instance(user, spec, cluster_id):
     'vm_id': spec.get("id"),
     'vm_name': spec.get("name"),
     'vm_namespace': spec.get("namespace"),
-}
+    }
 
-# Default values for creation
+    # Default values for creation
     defaults = {
         'pricing_id': determin_price_id(spec),
         'status': "started",
