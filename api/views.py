@@ -215,7 +215,7 @@ def GetSshKey(request, cluster_id):
     try:
         json = {"clusterid":cluster_id}
         # Making a GET request to the provided URL
-        res = requests.post(f"https://edgesphere.szsciit.com/k8s/clusters/{clusterid}/v1/cnos.io.sshpublic", cookies=COOKIES, verify=False, json = json)
+        res = requests.post(f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/cnos.io.sshpublic", cookies=COOKIES, verify=False, json = json)
         
         # Return the content and status code
         return HttpResponse(res.content, status=res.status_code)
