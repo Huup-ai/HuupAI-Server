@@ -207,14 +207,15 @@ class UserLogoutAPI(APIView):
         return Response({'message': 'User logged out successfully'})
     
 ###################################   INVENTORY API    #####################################
-@api_view(['GET'])
-def GetSshKey(request, clusterid):
+@api_view(['POST'])
+def GetSshKey(request, cluster_id):
     if not request.user.is_authenticated:
         return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
 
     try:
+        json = {"clusterid":cluster_id}
         # Making a GET request to the provided URL
-        res = requests.get(f"https://edgesphere.szsciit.com/k8s/clusters/{clusterid}/v1/cnos.io.sshpublic", cookies=COOKIES, verify=False)
+        res = requests.post(f"https://edgesphere.szsciit.com/k8s/clusters/{clusterid}/v1/cnos.io.sshpublic", cookies=COOKIES, verify=False, json = json)
         
         # Return the content and status code
         return HttpResponse(res.content, status=res.status_code)
