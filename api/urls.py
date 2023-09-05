@@ -14,5 +14,5 @@ urlpatterns = [
     path('instances/<str:cluster_id>/updatevm/',VMUpdate, name = 'vm-update'),
     path('instances/<str:cluster_id>/vmterminate/<str:name_space>/<str:vm_name>/',VMTerminate, name = 'vm-terminate'),
 
-    path('Inventory/getsshkey/<str:clusterid>/', GetSshKey, name='get-ssh-key'),
+    path('Inventory/getsshkey/<str:cluster_id>/', GetSshKey, name='get-ssh-key'),
     ]
