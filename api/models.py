@@ -18,6 +18,8 @@ class User(AbstractUser):
     email = models.EmailField(unique=True, blank=False, null=False)
     reg_date = models.DateTimeField(auto_now_add=True)
     company = models.CharField(max_length=255, blank=True, null=True)
+    ein = models.CharField(max_length=15, blank=True, null=True, help_text="Employer Identification Number")
+    address = models.TextField(blank=True, null=True)
     payment_method = models.CharField(max_length=50, blank=True, null=True)
     card_number = models.CharField(max_length=16, blank=True, null=True)
     card_exp = models.DateField(blank=True, null=True)
@@ -33,7 +35,7 @@ class Invoice(models.Model):
     invoice_id = models.AutoField(primary_key=True)
     invoice_time = models.DateTimeField()
     invoice_data = models.TextField(help_text="JSON formatted invoice data")
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     paid = models.BooleanField(default=False)
     
     def __str__(self):

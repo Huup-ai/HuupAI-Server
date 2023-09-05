@@ -37,7 +37,7 @@ def daily_billing():
                 'total_price': total_price,
             }
             Invoice.objects.create(
-                user=user,
+                user_id=user,
                 invoice_time=timezone.now(),
                 invoice_data=json.dumps(invoice_data)
             )

@@ -9,10 +9,10 @@ urlpatterns = [
     path('clusters/', getAllCluster, name='cluster-list'),
     path('clusters/<str:cluster_id>/', GetClusterByName, name='cluster-detail'),
 
-    path('VM/<str:cluster_id>/getvmstatus/<str:name_space>/<str:vm_name>/',VMGet, name = 'vm-get-status'),
-    path('VM/<str:cluster_id>/createvm/',VMCreate, name = 'vm-create'),
-    path('VM/<str:cluster_id>/updatevm/',VMUpdate, name = 'vm-update'),
-    path('VM/<str:cluster_id>/vmterminate/<str:name_space>/<str:vm_name>/',VMTerminate, name = 'vm-terminate'),
+    path('instances/<str:cluster_id>/getvmstatus/<str:name_space>/<str:vm_name>/',VMGet, name = 'vm-get-status'),
+    path('instances/<str:cluster_id>/createvm/',VMCreate, name = 'vm-create'),
+    path('instances/<str:cluster_id>/updatevm/',VMUpdate, name = 'vm-update'),
+    path('instances/<str:cluster_id>/vmterminate/<str:name_space>/<str:vm_name>/',VMTerminate, name = 'vm-terminate'),
 
-    path('api/getsshkey/<str:clusterid>/', GetSshKey, name='get-ssh-key'),
+    path('Inventory/getsshkey/<str:clusterid>/', GetSshKey, name='get-ssh-key'),
     ]
