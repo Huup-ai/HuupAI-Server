@@ -45,7 +45,6 @@ Make migrations (Note: whenever there is a database related error, run the follo
 python3 manage.py makemigrations
 python manage.py migrate --run-syncdb
 python3 manage.py migrate
-python3 manage.py runserver
 ```
 Run server:
 ```bash
