@@ -6,7 +6,10 @@ use the commented out code for the future use.
 
 The COOKIES IS FOR TEST ONLY
 '''
+import os
 COOKIES = {'R_SESS':'token-test01:62fwdpv2npks9vb4qbcjstzkrl98m6zc68tqrdmdkrdr4hjmtf98fz'}# DELETE THIS IN PRODUCTION USE
+CERT = os.path.join(os.path.dirname(__file__), 'certificate.pem')
+
 
 import requests
 from django.http import JsonResponse, HttpResponse
@@ -25,17 +28,17 @@ from rest_framework.permissions import IsAuthenticated
 ###################################   Cluster API   #####################################
 @api_view(['GET'])
 def getAllCluster(request):
-    try:
-        res = requests.get('https://edgesphere.szsciit.com/v1/management.cattle.io.clusters',cookies=COOKIES,headers={}, verify=False)
+    # try:
+        res = requests.get('https://edgesphere.szsciit.com/v1/management.cattle.io.clusters',cookies=COOKIES,headers={}, verify=CERT)
         return HttpResponse(res.content, status=res.status_code)
-    except:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    # except:
+    #     return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
 def GetClusterByName(requrest,cluster_id):
     try:
-        res = requests.get(f"https://edgesphere.szsciit.com/v1/management.cattle.io.clusters/{cluster_id}",cookies=COOKIES,headers={}, verify=False)
+        res = requests.get(f"https://edgesphere.szsciit.com/v1/management.cattle.io.clusters/{cluster_id}",cookies=COOKIES,headers={}, verify=CERT)
         return HttpResponse(res.content, status=res.status_code)
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -65,7 +68,7 @@ def VMGet(request, cluster_id, vm_name, vm_namespace):
             f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/kubevirt.io.virtualmachine/{vm_namespace}/{vm_name}",
             cookies=COOKIES,
             json=json,
-            verify=False
+            verify=CERT
         )
         
         if res.headers.get('content-type') == 'application/json':
@@ -97,7 +100,7 @@ def VMCreate(request,cluster_id):
         res = requests.post(f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/kubevirt.io.virtualmachine",
                             cookies=COOKIES,
                             json = json, 
-                            verify=False)
+                            verify=CERT)
         # Try to create the instance
         record = start_instance(request.user, spec, cluster_id)
         if record:
@@ -126,7 +129,7 @@ def VMUpdate(request, cluster_id, vm_name, vm_namespace):
             f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/kubevirt.io.virtualmachine/{vm_namespace}/{vm_name}?action={action}",
             cookies=COOKIES,
             json={"cluster_id": cluster_id, "action": action, "vmName":vm_name, "namespace":vm_namespace},
-            verify=False
+            verify=CERT
         )
 
         if res.status_code == 200:  # Assuming 200 is the success status code
@@ -162,7 +165,7 @@ def VMTerminate(request, cluster_id, vm_name, vm_namespace):
             f"wss://edgesphere.szsciit.com/wsproxy/k8s/clusters/{cluster_id}/apis/subresources.kubevirt.io/v1/namespaces/{vm_namespace}/virtualmachineinstances/{vm_name}/vnc",
             cookies=COOKIES,
             json=json,
-            verify=False
+            verify=CERT
         )
         
         # Check the response status. If the request was successful, update the instance.
@@ -215,7 +218,7 @@ def GetSshKey(request, cluster_id):
     try:
         json = {"clusterid":cluster_id}
         # Making a GET request to the provided URL
-        res = requests.post(f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/cnos.io.sshpublic", cookies=COOKIES, verify=False, json = json)
+        res = requests.post(f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/cnos.io.sshpublic", cookies=COOKIES, verify=CERT, json = json)
         
         # Return the content and status code
         return HttpResponse(res.content, status=res.status_code)
