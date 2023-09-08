@@ -106,7 +106,7 @@ def VMCreate(request,cluster_id):
     json = {'metadata':metadata,'spec':spec,'status':status_info}
 
     try:
-        record = start_instance(request.user, metadata, cluster_id)
+        start_instance(request.user, metadata, cluster_id)
         try:
             res = requests.post(f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/kubevirt.io.virtualmachine",
                             cookies=COOKIES,
