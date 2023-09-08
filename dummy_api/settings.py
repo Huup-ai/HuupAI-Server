@@ -58,7 +58,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_yasg',
 ]
-AUTH_USER_MODEL = "api.User" 
+AUTH_USER_MODEL = 'api.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

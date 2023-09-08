@@ -58,7 +58,7 @@ class Invoice(models.Model):
     invoice_id = models.AutoField(primary_key=True)
     invoice_time = models.DateTimeField()
     invoice_data = models.TextField(help_text="JSON formatted invoice data")
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     paid = models.BooleanField(default=False)
     
     def __str__(self):
@@ -66,15 +66,15 @@ class Invoice(models.Model):
 
 class Instance(models.Model):
     instance_id = models.AutoField(primary_key=True)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_instances')
-    provider_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='provider_instances', null=True, blank=True)
+    user_id = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='user_instances')
+    provider_id = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='provider_instances', null=True, blank=True)
     cluster = models.CharField(max_length=100, unique=False, null=False)
     vm_name = models.CharField(max_length=100, unique=True, null=False)
     vm_namespace = models.CharField(max_length=100, blank=True, null=True)
     status = models.CharField(max_length=100)
-    start_time = models.DateTimeField()
+    start_time = models.DateTimeField(blank=True, null=True)
     stop_time = models.DateTimeField(blank=True, null=True)
-    usage = models.FloatField()
+    usage = models.FloatField(blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     
     def __str__(self):
