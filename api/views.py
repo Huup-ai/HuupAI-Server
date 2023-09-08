@@ -47,6 +47,8 @@ def GetClusterByName(requrest,cluster_id):
 ###################################   VM API    #####################################
 @api_view(['GET'])
 def get_instances(request, email):
+    if not request.user.is_authenticated:
+        return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
     user = get_object_or_404(User, email=email)
     instances = Instance.objects.filter(user_id=user)
     serializer = InstanceSerializer(instances, many=True)
@@ -215,12 +217,17 @@ class UserLogoutAPI(APIView):
         logout(request)
         return Response({'message': 'User logged out successfully'})
 
-class UpdateUserInfoView(APIView):
+class UserUpdateRetrieveView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def patch(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         user = request.user
-        serializer = UserUpdateSerializer(user, data=request.data, partial=True)
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, *args, **kwargs):
+        user = request.user
+        serializer = UserSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)

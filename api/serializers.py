@@ -31,15 +31,11 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
                 user.save()
         return user
 
-class UserUpdateSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = [
-            'company', 'ein', 
-            'address', 'payment_method', 
-            'card_number', 'card_exp', 
-            'card_name', 'tax', 'role'
-        ]
+        fields = '__all__'
+        read_only_fields = ('email', 'reg_date', 'role')
 
 
 class VMCreateSerializer(serializers.Serializer):
