@@ -105,8 +105,8 @@ def VMCreate(request,cluster_id):
     status_info = serializer.validated_data['status']
     json = {'metadata':metadata,'spec':spec,'status':status_info}
 
-    record = start_instance(request.user, metadata, cluster_id)
-    if record:
+    try:
+        record = start_instance(request.user, metadata, cluster_id)
         try:
             res = requests.post(f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/kubevirt.io.virtualmachine",
                             cookies=COOKIES,
@@ -115,7 +115,7 @@ def VMCreate(request,cluster_id):
             return Response(res.content, status=res.status_code)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
-    else:
+    except:
         return JsonResponse({"error": "Can not create the instance"}, status=400)
     
 
