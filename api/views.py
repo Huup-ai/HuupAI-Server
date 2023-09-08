@@ -13,6 +13,7 @@ CERT = os.path.join(os.path.dirname(__file__), 'certificate.pem')
 
 import requests
 from django.http import JsonResponse, HttpResponse
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from django.shortcuts import redirect
 from .models import *
@@ -44,6 +45,13 @@ def GetClusterByName(requrest,cluster_id):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 ###################################   VM API    #####################################
+@api_view(['GET'])
+def get_instances(request, email):
+    user = get_object_or_404(User, email=email)
+    instances = Instance.objects.filter(user_id=user)
+    serializer = InstanceSerializer(instances, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
 @api_view(['POST'])
 def VMGet(request, cluster_id, vm_name, vm_namespace):
     # Authenticate the user
@@ -95,20 +103,18 @@ def VMCreate(request,cluster_id):
     status_info = serializer.validated_data['status']
     json = {'metadata':metadata,'spec':spec,'status':status_info}
 
-    try:
-        #send the requests to the cloud
-        res = requests.post(f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/kubevirt.io.virtualmachine",
+    record = start_instance(request.user, metadata, cluster_id)
+    if record:
+        try:
+            res = requests.post(f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/kubevirt.io.virtualmachine",
                             cookies=COOKIES,
                             json = json, 
                             verify=CERT)
-        # Try to create the instance
-        record = start_instance(request.user, spec, cluster_id)
-        if record:
             return Response(res.content, status=res.status_code)
-        else:
-            return JsonResponse({"error": "Can not create the instance"}, status=400)
-    except:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    else:
+        return JsonResponse({"error": "Can not create the instance"}, status=400)
     
 
 @api_view(['POST'])
@@ -208,6 +214,17 @@ class UserLogoutAPI(APIView):
     def post(self, request):
         logout(request)
         return Response({'message': 'User logged out successfully'})
+
+class UpdateUserInfoView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, *args, **kwargs):
+        user = request.user
+        serializer = UserUpdateSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 ###################################   INVENTORY API    #####################################
 @api_view(['POST'])

@@ -1,7 +1,9 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import *
+from .src.helper import get_external_api_token
 
+User = get_user_model()
 class InstanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Instance
@@ -12,7 +14,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     is_provider = serializers.BooleanField(required=True)
     
     class Meta:
-        model = get_user_model()
+        model = User
         fields = ['email','reg_date','company','password','is_provider','ein','address','payment_method'
                   ,'card_number','card_exp','card_name','tax','role']
 
@@ -21,8 +23,23 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         user = User(**validated_data)
         user.set_password(password)
         user.save()
+        if user.is_provider:
+        # Step 1: Get the token from the external API
+            token = get_external_api_token(user)
+            if token:
+                user.token = token
+                user.save()
         return user
 
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            'company', 'ein', 
+            'address', 'payment_method', 
+            'card_number', 'card_exp', 
+            'card_name', 'tax', 'role'
+        ]
 
 
 class VMCreateSerializer(serializers.Serializer):
