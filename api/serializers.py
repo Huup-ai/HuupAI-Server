@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.contrib.auth import get_user_model
 from .models import *
 
 class InstanceSerializer(serializers.ModelSerializer):
@@ -9,9 +10,11 @@ class InstanceSerializer(serializers.ModelSerializer):
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     is_provider = serializers.BooleanField(required=True)
+    
     class Meta:
-        model = User
-        fields = '__all__'
+        model = get_user_model()
+        fields = ['email','reg_date','company','password','is_provider','ein','address','payment_method'
+                  ,'card_number','card_exp','card_name','tax','role']
 
     def create(self, validated_data):
         password = validated_data.pop('password')
@@ -19,6 +22,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
         return user
+
 
 
 class VMCreateSerializer(serializers.Serializer):
