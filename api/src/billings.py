@@ -25,14 +25,7 @@ def daily_billing():
             
             # Create an invoice with this data
             invoice_data = {
-                'pricing': {
-                    'gpus': pricing.gpus,
-                    'vram_per_gpu': pricing.vram_per_gpu,
-                    'vcpus': pricing.vcpus,
-                    'ram': pricing.ram,
-                    'storage': pricing.storage,
-                    'price': str(pricing.price),
-                },
+                'price': str(pricing.price),
                 'usage': usage_hours,
                 'tax': tax,
                 'total_price': total_price,

@@ -49,10 +49,26 @@ def GetClusterByName(requrest,cluster_id):
 def get_instances(request, email):
     if not request.user.is_authenticated:
         return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
-    user = get_object_or_404(User, email=email)
-    instances = Instance.objects.filter(user_id=user)
+    
+    # Verify the email parameter matches the authenticated user's email
+    if request.user.email.lower() != email.lower():
+        return Response({"error": "Email parameter does not match authenticated user's email."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    instances = Instance.objects.filter(user_id=request.user)
+    
+    # Update the usage field for each instance
+    for instance in instances:
+        if instance.status == 'started':
+            time_delta = timezone.now() - instance.start_time
+            new_usage = time_delta.total_seconds() / 3600  # Calculate usage in hours
+            instance.usage += new_usage
+            instance.start_time = timezone.now()  # Reset the start_time to now
+            instance.save()
+
+    # Now serialize the updated instances data
     serializer = InstanceSerializer(instances, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 @api_view(['POST'])
 def VMGet(request, cluster_id, vm_name, vm_namespace):

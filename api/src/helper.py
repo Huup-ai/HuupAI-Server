@@ -64,9 +64,12 @@ def start_instance(user, spec, cluster_id):
 
 
 def update_instance(instance, action):
-    instance.status = action
-    stop_time = timezone.now()
-    instance.usage += (stop_time - instance.start_time).total_seconds() / 60 # Convert seconds to mins
-    if action == 'terminated':
-        instance.stop_time = stop_time
-    instance.save()
+    if instance.status!='terminated':
+        instance.status = action
+        stop_time = timezone.now()
+        instance.usage += (stop_time - instance.start_time).total_seconds() / 3600 # Convert seconds to mins
+        if action == 'terminated':
+            instance.stop_time = stop_time
+        else:
+            instance.start_time = timezone.now()
+        instance.save()
