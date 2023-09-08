@@ -44,7 +44,8 @@ class Invoice(models.Model):
 
 class Instance(models.Model):
     instance_id = models.AutoField(primary_key=True)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_instances')
+    provider_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='provider_instances', null=True, blank=True)
     pricing_id = models.ForeignKey(Pricing, on_delete=models.CASCADE)
     cluster = models.CharField(max_length=100, unique=True, null=False)
     vm_id = models.CharField(max_length=100, unique=True, null=False)
