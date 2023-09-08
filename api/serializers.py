@@ -8,10 +8,10 @@ class InstanceSerializer(serializers.ModelSerializer):
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
-
+    is_provider = serializers.BooleanField(required=True)
     class Meta:
         model = User
-        fields = ['email', 'password', 'first_name', 'last_name']
+        fields = '__all__'
 
     def create(self, validated_data):
         password = validated_data.pop('password')
