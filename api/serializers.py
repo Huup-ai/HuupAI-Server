@@ -23,6 +23,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         user.save()
         return user
     
+    
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,6 +31,10 @@ class UserSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ('email', 'reg_date', 'role', 'invoice_date' , 'is_provider')
 
+class PricingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Pricing
+        fields = '__all__'
 
 class VMCreateSerializer(serializers.Serializer):
     metadata = serializers.JSONField()

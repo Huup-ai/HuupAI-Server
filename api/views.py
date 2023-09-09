@@ -1,10 +1,10 @@
 '''
 IMPORTANT:
 
-This is the hard-coded version for internal tests only. Please delete the return statements and 
-use the commented out code for the future use.
+This is the hard-coded version for internal tests only. Please delete all the hardcoded token
+and api endpoints before deployment
 
-The COOKIES IS FOR TEST ONLY
+The COOKIES IS FOR SUPERUSER ONLY
 '''
 import os
 COOKIES = {'R_SESS':'token-test01:62fwdpv2npks9vb4qbcjstzkrl98m6zc68tqrdmdkrdr4hjmtf98fz'}# DELETE THIS IN PRODUCTION USE
@@ -21,7 +21,7 @@ from .serializers import *
 from .src.helper import *
 from rest_framework.views import APIView
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 
 from django.contrib.auth import login, logout, authenticate
 from rest_framework.permissions import IsAuthenticated
@@ -37,16 +37,48 @@ def getAllCluster(request):
 
 
 @api_view(['GET'])
-def GetClusterByName(requrest,cluster_id):
+def getClusterByName(requrest,cluster_id):
     try:
         res = requests.get(f"https://edgesphere.szsciit.com/v1/management.cattle.io.clusters/{cluster_id}",cookies=COOKIES,headers={}, verify=CERT)
         return HttpResponse(res.content, status=res.status_code)
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def setPrice(request):
+    user = request.user
+    if not user.is_provider:
+        return Response({'error': 'Only providers can set prices'}, status=status.HTTP_403_FORBIDDEN)
+
+    cluster_id = request.data.get('cluster_id')
+    price = request.data.get('price')
+
+    if cluster_id is None or price is None:
+        return Response({'error': 'cluster_id and price are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    pricing, created = Pricing.objects.update_or_create(
+        cluster_id=cluster_id, 
+        defaults={'price': price}
+    )
+    
+    serializer = PricingSerializer(pricing)
+    return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+
+@api_view(['GET'])
+def getClusterByUser(request):
+    user = request.user
+    if not user.is_provider:
+        return Response({'error': 'Only providers can get clusters'}, status=status.HTTP_403_FORBIDDEN)
+    # try:
+    res = requests.get('https://edgesphere.szsciit.com/v1/management.cattle.io.clusters',cookies=user.token,headers={}, verify=CERT)
+    return HttpResponse(res.content, status=res.status_code)
+    # except:
+    #     return Response(status=status.HTTP_404_NOT_FOUND)
 ###################################   VM API    #####################################
 @api_view(['GET'])
-def get_instances(request, email):
+def getInstances(request, email):
     if not request.user.is_authenticated:
         return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
     
@@ -238,7 +270,11 @@ class ProviderLoginOrRegisterView(APIView):
                     return Response({"error": "Invalid password"}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 # Register the user with the external service
-                response = requests.post('https://edgesphere.szsciit.com/v3-public/localProviders/local?action=login', data={'email': email, 'password': password, 'responseType':'cookie'})
+                response = requests.post('https://edgesphere.szsciit.com/v3-public/localProviders/local?action=login', 
+                                         data={'username': email, 
+                                               'password': password, 
+                                               'responseType':'cookie'},
+                                               verify=CERT)
                 if response.status_code == 200:
                     # Create a new user in your database
                     user = User.objects.create(email=email, is_provider=True)
@@ -291,7 +327,7 @@ class UserUpdateRetrieveView(APIView):
     
 ###################################   INVENTORY API    #####################################
 @api_view(['POST'])
-def GetSshKey(request, cluster_id):
+def getSshKey(request, cluster_id):
     if not request.user.is_authenticated:
         return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
 

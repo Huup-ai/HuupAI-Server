@@ -48,3 +48,5 @@ def daily_billing():
                     print(f"Error processing instance ID {instance.id}: {e}")
             
             Instance.objects.bulk_update(to_update_instances, ['usage', 'start_time'])
+            user.invoice_date = today
+            user.save()
