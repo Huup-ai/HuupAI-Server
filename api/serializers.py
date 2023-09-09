@@ -15,27 +15,21 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['email','reg_date','company','password','is_provider','ein','address','payment_method'
-                  ,'card_number','card_exp','card_name','tax','role']
+        fields = ['email','password','is_provider']
 
     def create(self, validated_data):
         password = validated_data.pop('password')
         user = User(**validated_data)
         user.set_password(password)
         user.save()
-        if user.is_provider:
-        # Step 1: Get the token from the external API
-            token = get_external_api_token(user)
-            if token:
-                user.token = token
-                user.save()
         return user
+    
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
-        read_only_fields = ('email', 'reg_date', 'role')
+        read_only_fields = ('email', 'reg_date', 'role', 'invoice_date' , 'is_provider')
 
 
 class VMCreateSerializer(serializers.Serializer):
