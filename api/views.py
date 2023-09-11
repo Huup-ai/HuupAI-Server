@@ -31,7 +31,10 @@ from rest_framework.permissions import IsAuthenticated
 def getAllCluster(request):
     # try:
         res = requests.get('https://edgesphere.szsciit.com/v1/management.cattle.io.clusters',cookies=COOKIES,headers={}, verify=CERT)
-        return HttpResponse(res.content, status=res.status_code)
+        if 200 <= res.status_code <= 299:
+            return HttpResponse(res.content, status=res.status_code)
+        else:
+            return Response({'error': 'Bad Request'}, status=status.HTTP_400_BAD_REQUEST)
     # except:
     #     return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -40,14 +43,16 @@ def getAllCluster(request):
 def getClusterByName(requrest,cluster_id):
     try:
         res = requests.get(f"https://edgesphere.szsciit.com/v1/management.cattle.io.clusters/{cluster_id}",cookies=COOKIES,headers={}, verify=CERT)
-        return HttpResponse(res.content, status=res.status_code)
+        if 200 <= res.status_code <= 299:
+            return HttpResponse(res.content, status=res.status_code)
+        else:
+            return Response({'error': 'Bad Request'}, status=status.HTTP_400_BAD_REQUEST)
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-@api_view(['POST','GET'])
+@api_view(['POST'])
 def setPrice(request):
-    print('111111')
     if not request.user.is_authenticated:
         return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
     
@@ -79,7 +84,10 @@ def getClusterByUser(request):
         return Response({'error': 'Only providers can get clusters'}, status=status.HTTP_403_FORBIDDEN)
     # try:
     res = requests.get('https://edgesphere.szsciit.com/v1/management.cattle.io.clusters',cookies=user.token,headers={}, verify=CERT)
-    return HttpResponse(res.content, status=res.status_code)
+    if 200 <= res.status_code <= 299:
+            return HttpResponse(res.content, status=res.status_code)
+    else:
+        return Response({'error': 'Bad Request'}, status=status.HTTP_400_BAD_REQUEST)
     # except:
     #     return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -136,43 +144,59 @@ def VMGet(request, cluster_id, vm_name, vm_namespace):
             json=json,
             verify=CERT
         )
-        
-        if res.headers.get('content-type') == 'application/json':
-            return JsonResponse(res.json())
-        
-        return HttpResponse(res.content, status=res.status_code)
+        if 200 <= res.status_code <= 299:
+            if res.headers.get('content-type') == 'application/json':
+                return JsonResponse(res.json())
+            return HttpResponse(res.content, status=res.status_code)
+        else:
+            return Response({'error': 'Bad Request'}, status=status.HTTP_400_BAD_REQUEST)
     
     except requests.RequestException as e:  # Catching specific requests exceptions
         return Response({"error": str(e)}, status=500)
 
 
 @api_view(['POST'])
-def VMCreate(request,cluster_id):
-    #First check if user is anthenticated
+def VMCreate(request, cluster_id):
+    # First check if user is authenticated
     if not request.user.is_authenticated:
         return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
-    # create the serializer
+    
+    # Create the serializer
     serializer = VMCreateSerializer(data=request.data)
     if not serializer.is_valid():
-        return Response(serializer.errors, status=400)
-    #extract necessory data from request
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Extract necessary data from request
     metadata = serializer.validated_data['metadata']
     spec = serializer.validated_data['spec']
     status_info = serializer.validated_data['status']
-    json = {'metadata':metadata,'spec':spec,'status':status_info}
-
+    payload = {'metadata': metadata, 'spec': spec, 'status': status_info}
+    
+    # Create an instance in the database
     try:
-        start_instance(request.user, metadata, cluster_id)
-        try:
-            res = requests.post(f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/kubevirt.io.virtualmachine",
-                            cookies=COOKIES,
-                            json = json, 
-                            verify=CERT)
-            return Response(res.content, status=res.status_code)
-        except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-    except:
-        return JsonResponse({"error": "Can not create the instance"}, status=400)
+        instance = start_instance(request.user, metadata, cluster_id)
+    except Exception as e:
+        return JsonResponse({"error": f"Cannot create the instance in the database: {e}"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        # Try to make the API call
+        res = requests.post(
+            f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/kubevirt.io.virtualmachine",
+            cookies=COOKIES,
+            json=payload, 
+            verify=CERT
+        )
+        res.raise_for_status()
+        # If the API call was successful, return a success response
+        return HttpResponse(res.content, status=res.status_code)
+    except requests.exceptions.HTTPError as http_err:
+        # If the API call was not successful, delete the database instance
+        instance.delete()
+        return Response({"error": f"HTTP error occurred: {http_err}"}, status=res.status_code)
+    except Exception as err:
+        # If the API call was not successful, delete the database instance
+        instance.delete()
+        return Response({"error": f"An error occurred: {err}"}, status=status.HTTP_400_BAD_REQUEST)
     
 
 @api_view(['POST'])
@@ -202,8 +226,9 @@ def VMUpdate(request, cluster_id, vm_name, vm_namespace):
             
             # Update the instance using the provided function
             update_instance(instance, action)
-
-        return Response(res.json(), status=res.status_code)
+            
+        else:
+            return Response({'error': 'Bad Request'}, status=status.HTTP_400_BAD_REQUEST)
     except Instance.DoesNotExist:
         return Response({"error": "Instance not found."}, status=status.HTTP_404_NOT_FOUND)
     except requests.RequestException as e:  # Catching specific requests exceptions
