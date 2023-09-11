@@ -45,9 +45,12 @@ def getClusterByName(requrest,cluster_id):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@api_view(['POST','GET'])
 def setPrice(request):
+    print('111111')
+    if not request.user.is_authenticated:
+        return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
+    
     user = request.user
     if not user.is_provider:
         return Response({'error': 'Only providers can set prices'}, status=status.HTTP_403_FORBIDDEN)
@@ -68,6 +71,9 @@ def setPrice(request):
 
 @api_view(['GET'])
 def getClusterByUser(request):
+    if not request.user.is_authenticated:
+        return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
+    
     user = request.user
     if not user.is_provider:
         return Response({'error': 'Only providers can get clusters'}, status=status.HTTP_403_FORBIDDEN)
@@ -76,6 +82,8 @@ def getClusterByUser(request):
     return HttpResponse(res.content, status=res.status_code)
     # except:
     #     return Response(status=status.HTTP_404_NOT_FOUND)
+
+    
 ###################################   VM API    #####################################
 @api_view(['GET'])
 def getInstances(request, email):
@@ -247,6 +255,23 @@ class UserRegistrationAPI(APIView):
             return Response({'message': 'User registered successfully'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class UserLoginAPI(APIView):
+    def post(self, request):
+        email = request.data.get('email')  # Change from username to email
+        password = request.data.get('password')
+        user = User.objects.filter(email=email).first()  # Change from username to email
+
+        if user and user.check_password(password):
+            login(request, user)
+            return Response({'message': 'User logged in successfully'})
+        return Response({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+class UserLogoutAPI(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        logout(request)
+        return Response({'message': 'User logged out successfully'})
 
 class ProviderLoginOrRegisterView(APIView):
     def post(self, request, format=None):
@@ -290,24 +315,6 @@ class ProviderLoginOrRegisterView(APIView):
                     return Response({"error": "External service registration failed"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-class UserLoginAPI(APIView):
-    def post(self, request):
-        email = request.data.get('email')  # Change from username to email
-        password = request.data.get('password')
-        user = User.objects.filter(email=email).first()  # Change from username to email
-
-        if user and user.check_password(password):
-            login(request, user)
-            return Response({'message': 'User logged in successfully'})
-        return Response({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-
-class UserLogoutAPI(APIView):
-    permission_classes = (IsAuthenticated,)
-
-    def post(self, request):
-        logout(request)
-        return Response({'message': 'User logged out successfully'})
 
 class UserUpdateRetrieveView(APIView):
     permission_classes = [IsAuthenticated]

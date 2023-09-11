@@ -9,8 +9,8 @@ urlpatterns = [
     path('users/info/', UserUpdateRetrieveView.as_view(), name='user-info'),
     
     path('clusters/', getAllCluster, name='cluster-list'),
-    path('clusters/<str:cluster_id>/', getClusterByName, name='cluster-detail'),
-    path('clusters/my_clusters/', getClusterByName, name='mycluster'),
+    path('clusters/cluster_name/<str:cluster_id>/', getClusterByName, name='cluster-detail'),
+    path('clusters/my_clusters/', getClusterByUser, name='my-cluster'),
     path('clusters/set_price/', setPrice, name='set-price'),
 
     path('instances/<str:cluster_id>/getvmstatus/<str:name_space>/<str:vm_name>/',VMGet, name = 'vm-get-status'),
