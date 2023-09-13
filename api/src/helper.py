@@ -7,24 +7,22 @@ from django.core.exceptions import ObjectDoesNotExist
 
 def get_external_api_token(user):
     try:
-        # Define the API endpoint and the payload
         url = "https://edgesphereszsciit.com/v3-public/localProviders/local?action=login"
         payload = {
             "username": user.email, # Assuming username is the email of the user
             "password": user.password, # You should store passwords securely (hashed) and not in plain text
         }
-        # Send the POST request
+        # send the POST request
         response = requests.post(url, json=payload)
 
         if response.status_code == 200:
-            # Extract the token from the Set-Cookie header
+            # extract the token
             cookies = response.headers.get('Set-Cookie')
             if cookies:
                 token = cookies.split(';')[0].split('=')[1]
                 return token
         else:
-            # Handle unsuccessful response (you might want to log this)
-            return None
+            raise Exception
     except Exception as e:
         print(f"An error occurred: {e}")
         return None
@@ -53,7 +51,6 @@ def start_instance(user, spec, cluster_id):
         'usage': 0.0,
         'price': price,
         }
-
     # Merging two dictionaries
     data = {**unique_data, **defaults}
 

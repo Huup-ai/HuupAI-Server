@@ -53,6 +53,7 @@ def getClusterByName(requrest,cluster_id):
 
 @api_view(['POST'])
 def setPrice(request):
+    # user must be a provider and must be logged in
     if not request.user.is_authenticated:
         return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
     
@@ -76,6 +77,7 @@ def setPrice(request):
 
 @api_view(['GET'])
 def getClusterByUser(request):
+    # user must be a provider and must be logged in
     if not request.user.is_authenticated:
         return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
     
@@ -106,6 +108,7 @@ def getInstances(request, email):
     
     # Update the usage field for each instance
     for instance in instances:
+        # first check if the instance is already terminated
         if instance.status != 'terminated':
             time_delta = timezone.now() - instance.start_time
             new_usage = time_delta.total_seconds() / 3600  # Calculate usage in hours
@@ -113,7 +116,7 @@ def getInstances(request, email):
             instance.start_time = timezone.now()  # Reset the start_time to now
             instance.save()
 
-    # Now serialize the updated instances data
+    # serialize the updated instances data
     serializer = InstanceSerializer(instances, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -157,16 +160,15 @@ def VMGet(request, cluster_id, vm_name, vm_namespace):
 
 @api_view(['POST'])
 def VMCreate(request, cluster_id):
-    # First check if user is authenticated
+    # first check if user is authenticated
     if not request.user.is_authenticated:
         return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
     
-    # Create the serializer
+    # feed into the serializer
     serializer = VMCreateSerializer(data=request.data)
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    # Extract necessary data from request
     metadata = serializer.validated_data['metadata']
     spec = serializer.validated_data['spec']
     status_info = serializer.validated_data['status']
@@ -197,7 +199,7 @@ def VMCreate(request, cluster_id):
 
 @api_view(['POST'])
 def VMUpdate(request, cluster_id, vm_name, vm_namespace):
-    #First check if user is anthenticated
+    #check if user is anthenticated
     if not request.user.is_authenticated:
         return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
     
@@ -205,7 +207,6 @@ def VMUpdate(request, cluster_id, vm_name, vm_namespace):
 
     if not serializer.is_valid():
         return Response(serializer.errors, status=400)
-
     action = serializer.validated_data['action']
 
     try:
@@ -216,11 +217,11 @@ def VMUpdate(request, cluster_id, vm_name, vm_namespace):
             verify=CERT
         )
 
-        if res.status_code == 200:  # Assuming 200 is the success status code
+        if res.status_code == 200:
             # Retrieve the corresponding instance
             instance = Instance.objects.get(user_id=request.user, vm_name=vm_name)
             
-            # Update the instance using the provided function
+            # Update the instance using src helper function
             update_instance(instance, action)
             
         else:
@@ -244,7 +245,7 @@ def VMTerminate(request, cluster_id, vm_name, vm_namespace):
             user_id=request.user
         )
 
-        # If instance exists, send the request to terminate the VM in the cloud
+        # if instance exists, send the request to terminate the VM in the cloud
         json = {'clusterid': cluster_id, 'vmName': vm_name, 'namespace': vm_namespace}
         res = requests.post(
             f"wss://edgesphere.szsciit.com/wsproxy/k8s/clusters/{cluster_id}/apis/subresources.kubevirt.io/v1/namespaces/{vm_namespace}/virtualmachineinstances/{vm_name}/vnc",
@@ -253,8 +254,8 @@ def VMTerminate(request, cluster_id, vm_name, vm_namespace):
             verify=CERT
         )
         
-        # Check the response status. If the request was successful, update the instance.
-        if res.status_code == 200:  # Assuming a 200 status code indicates success
+        # If the request was successful, update the instance.
+        if res.status_code == 200:
             update_instance(instance, "terminated")
             return JsonResponse(res.json())
         else:
@@ -315,7 +316,7 @@ class ProviderLoginOrRegisterView(APIView):
                 else:
                     return Response({"error": "Invalid password"}, status=status.HTTP_400_BAD_REQUEST)
             else:
-                # Register the user with the external service
+                # Register the user with api
                 response = requests.post('https://edgesphere.szsciit.com/v3-public/localProviders/local?action=login', 
                                          data={'username': email, 
                                                'password': password, 
