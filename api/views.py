@@ -400,7 +400,7 @@ def pay_invoice(request, invoice_id):
         invoice.paid = True
         invoice.save()
         
-        # Reset the invoice table (here we are resetting all the paid invoices)
+        # Reset the invoice table
         with transaction.atomic():
             Invoice.objects.filter(paid=True).delete()
 
