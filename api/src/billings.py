@@ -34,6 +34,7 @@ def daily_billing():
                         'usage': usage_hours,
                         'tax': tax,
                         'total_price': total_price,
+                        'paid':False,
                     }
                     Invoice.objects.create(
                         user_id=user,

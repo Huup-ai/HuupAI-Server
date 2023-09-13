@@ -20,4 +20,6 @@ urlpatterns = [
     path('instances/<str:cluster_id>/vmterminate/<str:name_space>/<str:vm_name>/',VMTerminate, name = 'vm-terminate'),
 
     path('Inventory/getsshkey/<str:cluster_id>/', getSshKey, name='get-ssh-key'),
+    path('invoices/', get_invoices, name='get-invoices'),
+    path('invoices/pay/<int:invoice_id>/', pay_invoice, name='pay-invoice'),
     ]

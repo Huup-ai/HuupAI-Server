@@ -25,6 +25,7 @@ from rest_framework.decorators import api_view, permission_classes
 
 from django.contrib.auth import login, logout, authenticate
 from rest_framework.permissions import IsAuthenticated
+from django.db import transaction
 
 ###################################   Cluster API   #####################################
 @api_view(['GET'])
@@ -357,6 +358,7 @@ class UserUpdateRetrieveView(APIView):
 ###################################   INVENTORY API    #####################################
 @api_view(['POST'])
 def getSshKey(request, cluster_id):
+
     if not request.user.is_authenticated:
         return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -369,3 +371,39 @@ def getSshKey(request, cluster_id):
         return HttpResponse(res.content, status=res.status_code)
     except requests.RequestException as e:  # Catching specific requests exceptions
         return Response({"error": str(e)}, status=500)
+
+@api_view(['GET'])
+def get_invoices(request):
+    try:
+        if not request.user.is_authenticated:
+            return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
+        # Get all the invoices for the authenticated user
+        invoices = Invoice.objects.filter(user_id=request.user)
+        
+        # Serialize the invoice data
+        serializer = InvoiceSerializer(invoices, many=True)
+        
+        # Return the serialized data in the response
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Invoice.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+def pay_invoice(request, invoice_id):
+    try:
+        # Get the invoice to be paid
+        invoice = Invoice.objects.get(invoice_id=invoice_id, user_id=request.user)
+        
+        # Mark the invoice as paid
+        invoice.paid = True
+        invoice.save()
+        
+        # Reset the invoice table (here we are resetting all the paid invoices)
+        with transaction.atomic():
+            Invoice.objects.filter(paid=True).delete()
+
+        return Response({'message': 'Invoice paid and table reset successfully'}, status=status.HTTP_200_OK)
+    except Invoice.DoesNotExist:
+        return Response({'error': 'Invoice not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
