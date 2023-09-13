@@ -48,8 +48,6 @@ class User(AbstractUser):
     tax = models.FloatField(blank=True, null=True)
     role = models.CharField(max_length=255, blank=True, null=True)
     token = models.CharField(max_length=255, blank=True, null=True)
-    wallet_address = models.CharField(max_length=42, unique=True, null=True, blank=True)
-    public_key = models.CharField(max_length=130, null=True, blank=True)
 
     objects = CustomUserManager()
 
@@ -83,3 +81,11 @@ class Instance(models.Model):
     def __str__(self):
         return f"Instance {self.vm_name} created by {self.user_id}"
     
+
+class Wallet(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    address = models.CharField(max_length=255)
+    is_provider = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.user}'s wallet"

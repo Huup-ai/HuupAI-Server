@@ -22,4 +22,7 @@ urlpatterns = [
     path('Inventory/getsshkey/<str:cluster_id>/', getSshKey, name='get-ssh-key'),
     path('invoices/get_user_invoices/', get_invoices, name='get-invoices'),
     path('invoices/pay/<int:invoice_id>/', pay_invoice, name='pay-invoice'),
+    
+    path('wallets/get_wallets/', get_wallets, name='get-wallets'),
+    path('wallet/add/', add_or_update_wallet, name='add-or-update-wallet'),
     ]
