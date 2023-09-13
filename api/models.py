@@ -48,6 +48,8 @@ class User(AbstractUser):
     tax = models.FloatField(blank=True, null=True)
     role = models.CharField(max_length=255, blank=True, null=True)
     token = models.CharField(max_length=255, blank=True, null=True)
+    wallet_address = models.CharField(max_length=42, unique=True, null=True, blank=True)
+    public_key = models.CharField(max_length=130, null=True, blank=True)
 
     objects = CustomUserManager()
 

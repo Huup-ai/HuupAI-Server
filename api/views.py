@@ -189,10 +189,6 @@ def VMCreate(request, cluster_id):
         res.raise_for_status()
         # If the API call was successful, return a success response
         return HttpResponse(res.content, status=res.status_code)
-    except requests.exceptions.HTTPError as http_err:
-        # If the API call was not successful, delete the database instance
-        instance.delete()
-        return Response({"error": f"HTTP error occurred: {http_err}"}, status=res.status_code)
     except Exception as err:
         # If the API call was not successful, delete the database instance
         instance.delete()
