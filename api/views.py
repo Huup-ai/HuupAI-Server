@@ -391,6 +391,8 @@ def get_invoices(request):
 @api_view(['POST'])
 def pay_invoice(request, invoice_id):
     try:
+        if not request.user.is_authenticated:
+            return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
         # Get the invoice to be paid
         invoice = Invoice.objects.get(invoice_id=invoice_id, user_id=request.user)
         
