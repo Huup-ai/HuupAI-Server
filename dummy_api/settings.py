@@ -36,13 +36,6 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 
-CELERY_BEAT_SCHEDULE = {
-    'run_daily_billing_every_day': {
-        'task': 'billing.tasks.daily_billing_task',
-        'schedule': timedelta(days=1),
-    },
-}
-
 # Application definition
 
 INSTALLED_APPS = [
