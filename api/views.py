@@ -409,3 +409,32 @@ def pay_invoice(request, invoice_id):
         return Response({'error': 'Invoice not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+###################################   Web3 API    #####################################
+@api_view(['GET'])
+def get_wallets(request):
+    # the user must be logged in to view his wallets
+    if request.user.is_authenticated:
+        wallets = Wallet.objects.filter(user=request.user)
+        serializer = WalletSerializer(wallets, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response({'error': 'User not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+
+@api_view(['POST'])
+def add_or_update_wallet(request):
+    if request.user.is_authenticated:
+        serializer = WalletSerializer(data=request.data)
+        if serializer.is_valid():
+            is_provider = serializer.validated_data.get('is_provider')
+            
+            # If the user is a provider, update the existing wallet address
+            if is_provider:
+                Wallet.objects.filter(user=request.user, is_provider=True).delete()
+            
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response({'error': 'User not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)

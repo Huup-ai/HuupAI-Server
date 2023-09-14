@@ -20,3 +20,9 @@ def setup_periodic_tasks(sender, **kwargs):
         crontab(hour=0, minute=0),
         daily_billing.s(),
     )
+
+@current_app.on_after_configure.connect
+def setup_periodic_tasks(sender, **kwargs):
+    from api.web3 import check_instance_status
+    #runs the check_instance_status every hour
+    sender.add_periodic_task(3600.0, check_instance_status.s(), name='Check instance status every hour')
