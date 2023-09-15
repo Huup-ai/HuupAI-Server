@@ -14,17 +14,28 @@ def check_instance_status():
 
     contract_address = '0x2B980535c951fD7B41404196C04Ce3C74775B879'
     contract = web3.eth.contract(address=contract_address, abi=abi)
+
+    wallet_users = Wallet.objects.values_list('user', flat=True)
+    instances = Instance.objects.filter(user_id__in=wallet_users)
     
-    instances = Instance.objects.all()
     # Loop through the instances and check their status
     for instance in instances:
         status = contract.functions.getStatus(instance.id).call()
         if status == 0:
             continue
         elif status == 1:
-            #TODO:send email
-            pass
+            send_mail(
+                'Instance Low Balance Notification',
+                'Your instance is ending soon due to low balance',
+                'contact@huupai.xyz',
+                [instance.user_id.email],
+            )
         elif status == 3:
              update_instance(instance,'terminated')
-             #TODO:send email
+             send_mail(
+                'Instance Terminate Notification',
+                'Your instance is now been terminated',
+                'contact@huupai.xyz',
+                [instance.user_id.email],
+            )
 
