@@ -27,8 +27,12 @@ from django.contrib.auth import login, logout, authenticate
 from rest_framework.permissions import IsAuthenticated
 from django.db import transaction
 
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import AllowAny
+
 ###################################   Cluster API   #####################################
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def getAllCluster(request):
     # try:
         res = requests.get('https://edgesphere.szsciit.com/v1/management.cattle.io.clusters',cookies=COOKIES,headers={}, verify=CERT)
@@ -55,9 +59,6 @@ def getClusterByName(requrest,cluster_id):
 @api_view(['POST'])
 def setPrice(request):
     # user must be a provider and must be logged in
-    if not request.user.is_authenticated:
-        return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
-    
     user = request.user
     if not user.is_provider:
         return Response({'error': 'Only providers can set prices'}, status=status.HTTP_403_FORBIDDEN)
@@ -269,7 +270,7 @@ def VMTerminate(request, cluster_id, vm_name, vm_namespace):
 
 
 ###################################   USER API    #####################################
-
+@permission_classes([AllowAny])
 class UserRegistrationAPI(APIView):
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
@@ -278,6 +279,7 @@ class UserRegistrationAPI(APIView):
             return Response({'message': 'User registered successfully'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@permission_classes([AllowAny])
 class UserLoginAPI(APIView):
     def post(self, request):
         email = request.data.get('email')  # Change from username to email
@@ -296,6 +298,7 @@ class UserLogoutAPI(APIView):
         logout(request)
         return Response({'message': 'User logged out successfully'})
 
+@permission_classes([AllowAny])
 class ProviderLoginOrRegisterView(APIView):
     def post(self, request, format=None):
         email = request.data.get('email')
