@@ -30,6 +30,9 @@ ALLOWED_HOSTS = ['*']
 CORS_ALLOWED_ORIGINS = ['http://localhost:3000']
 CORS_ALLOW_CREDENTIALS = True
 
+CSRF_COOKIE_DOMAIN = "localhost"
+CSRF_TRUSTED_ORIGINS = ['localhost:3000']
+
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 SESSION_COOKIE_DOMAIN = "localhost"
 SESSION_COOKIE_AGE = 1209600
