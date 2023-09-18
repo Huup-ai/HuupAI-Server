@@ -288,6 +288,7 @@ class UserLoginAPI(APIView):
 
         if user and user.check_password(password):
             login(request, user)
+            print("User logged in successfully")
             return Response({'message': 'User logged in successfully'})
         return Response({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
