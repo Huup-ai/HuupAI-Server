@@ -291,6 +291,7 @@ class UserLoginAPI(APIView):
             print("User logged in successfully")
             return Response({'message': 'User logged in successfully'})
         return Response({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+    
 
 class UserLogoutAPI(APIView):
     permission_classes = (IsAuthenticated,)
