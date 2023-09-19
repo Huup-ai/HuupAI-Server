@@ -162,10 +162,11 @@ def VMGet(request, cluster_id, vm_name, vm_namespace):
 
 @api_view(['POST'])
 def VMCreate(request, cluster_id):
+    print('is authorized?')
     # first check if user is authenticated
     if not request.user.is_authenticated:
         return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
-    
+    print("yeah!")
     # feed into the serializer
     serializer = VMCreateSerializer(data=request.data)
     if not serializer.is_valid():
@@ -292,7 +293,6 @@ class UserLoginAPI(APIView):
             return Response({'message': 'User logged in successfully'})
         return Response({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
     
-@permission_classes([AllowAny])
 class UserLogoutAPI(APIView):
     permission_classes = (IsAuthenticated,)
 
