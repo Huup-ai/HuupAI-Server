@@ -292,7 +292,7 @@ class UserLoginAPI(APIView):
             return Response({'message': 'User logged in successfully'})
         return Response({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
     
-
+@permission_classes([AllowAny])
 class UserLogoutAPI(APIView):
     permission_classes = (IsAuthenticated,)
 
