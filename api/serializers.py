@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import *
-from .src.helper import get_external_api_token
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 User = get_user_model()
 class InstanceSerializer(serializers.ModelSerializer):
@@ -23,6 +23,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         user.save()
         return user
     
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    username_field = 'email'
     
 
 class UserSerializer(serializers.ModelSerializer):

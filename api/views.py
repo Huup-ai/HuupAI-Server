@@ -27,9 +27,9 @@ from django.contrib.auth import login, logout, authenticate
 from rest_framework.permissions import IsAuthenticated
 from django.db import transaction
 
-from rest_framework.decorators import permission_classes
+
 from rest_framework.permissions import AllowAny
-from rest_framework.authentication import SessionAuthentication
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 ###################################   Cluster API   #####################################
 @api_view(['GET'])
@@ -163,11 +163,9 @@ def VMGet(request, cluster_id, vm_name, vm_namespace):
 
 @api_view(['POST'])
 def VMCreate(request, cluster_id):
-    print('is authorized?')
     # first check if user is authenticated
     if not request.user.is_authenticated:
         return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
-    print("yeah!")
     # feed into the serializer
     serializer = VMCreateSerializer(data=request.data)
     if not serializer.is_valid():
@@ -282,32 +280,11 @@ class UserRegistrationAPI(APIView):
             return Response({'message': 'User registered successfully'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class UserLoginAPI(APIView):
-    permission_classes = (permissions.AllowAny,)
-    authentication_classes = (SessionAuthentication,)
-
-    def post(self, request):
-        email = request.data.get('email')  # Change from username to email
-        password = request.data.get('password')
-        user = User.objects.filter(email=email).first()  # Change from username to email
-
-        if user and user.check_password(password):
-            login(request, user)
-            print("User logged in successfully")
-            return Response({'message': 'User logged in successfully'})
-        return Response({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-    
-class UserLogoutAPI(APIView):
-    permission_classes = (permissions.AllowAny,)
-    authentication_classes = ()
-    def post(self, request):
-        logout(request)
-        return Response({'message': 'User logged out successfully'})
-
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 class ProviderLoginOrRegisterView(APIView):
     permission_classes = (permissions.AllowAny,)
-    authentication_classes = (SessionAuthentication,)
 
     def post(self, request, format=None):
         email = request.data.get('email')
@@ -353,7 +330,6 @@ class ProviderLoginOrRegisterView(APIView):
 
 class UserUpdateRetrieveView(APIView):
     permission_classes = (permissions.AllowAny,)
-    authentication_classes = (SessionAuthentication,)
 
     def get(self, request, *args, **kwargs):
         user = request.user
