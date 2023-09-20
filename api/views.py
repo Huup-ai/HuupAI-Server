@@ -271,8 +271,9 @@ def VMTerminate(request, cluster_id, vm_name, vm_namespace):
 
 
 ###################################   USER API    #####################################
-@permission_classes([AllowAny])
 class UserRegistrationAPI(APIView):
+    permission_classes = (permissions.AllowAny,)
+
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
@@ -280,8 +281,10 @@ class UserRegistrationAPI(APIView):
             return Response({'message': 'User registered successfully'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@permission_classes([AllowAny])
 class UserLoginAPI(APIView):
+    permission_classes = (permissions.AllowAny,)
+    authentication_classes = (SessionAuthentication,)
+
     def post(self, request):
         email = request.data.get('email')  # Change from username to email
         password = request.data.get('password')
@@ -294,8 +297,8 @@ class UserLoginAPI(APIView):
         return Response({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
     
 class UserLogoutAPI(APIView):
-    permission_classes = (IsAuthenticated,)
-
+    permission_classes = (permissions.AllowAny,)
+    authentication_classes = ()
     def post(self, request):
         logout(request)
         return Response({'message': 'User logged out successfully'})
