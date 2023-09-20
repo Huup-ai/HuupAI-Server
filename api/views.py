@@ -20,7 +20,7 @@ from .models import *
 from .serializers import *
 from .src.helper import *
 from rest_framework.views import APIView
-from rest_framework import status
+from rest_framework import status, permissions
 from rest_framework.decorators import api_view, permission_classes
 
 from django.contrib.auth import login, logout, authenticate
