@@ -304,8 +304,11 @@ class UserLogoutAPI(APIView):
         logout(request)
         return Response({'message': 'User logged out successfully'})
 
-@permission_classes([AllowAny])
+
 class ProviderLoginOrRegisterView(APIView):
+    permission_classes = (permissions.AllowAny,)
+    authentication_classes = (SessionAuthentication,)
+
     def post(self, request, format=None):
         email = request.data.get('email')
         password = request.data.get('password')
@@ -349,7 +352,8 @@ class ProviderLoginOrRegisterView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class UserUpdateRetrieveView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = (permissions.AllowAny,)
+    authentication_classes = (SessionAuthentication,)
 
     def get(self, request, *args, **kwargs):
         user = request.user
