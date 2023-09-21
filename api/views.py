@@ -164,8 +164,8 @@ def VMGet(request, cluster_id, vm_name, vm_namespace):
 @api_view(['POST'])
 def VMCreate(request, cluster_id):
     # first check if user is authenticated
-    if not request.user.is_authenticated:
-        return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
+    # if not request.user.is_authenticated:
+    #     return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
     # feed into the serializer
     serializer = VMCreateSerializer(data=request.data)
     if not serializer.is_valid():
@@ -175,13 +175,11 @@ def VMCreate(request, cluster_id):
     spec = serializer.validated_data['spec']
     status_info = serializer.validated_data['status']
     payload = {'metadata': metadata, 'spec': spec, 'status': status_info}
-    
     # Create an instance in the database
     try:
         instance = start_instance(request.user, metadata, cluster_id)
     except Exception as e:
-        return JsonResponse({"error": f"Cannot create the instance in the database: {e}"}, status=status.HTTP_400_BAD_REQUEST)
-    
+        return Response({"error": f"Cannot create the instance in the database: {e}"}, status=status.HTTP_400_BAD_REQUEST)
     try:
         # Try to make the API call
         res = requests.post(
