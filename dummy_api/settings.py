@@ -61,6 +61,9 @@ EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'yourinstance<contact@huupai.xyz>'
 
 # Application definition
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+}
 
 INSTALLED_APPS = [
     'rest_framework',
