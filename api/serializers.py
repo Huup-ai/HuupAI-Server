@@ -54,6 +54,8 @@ class InvoiceSerializer(serializers.ModelSerializer):
         depth = 1
 
 class WalletSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+
     class Meta:
         model = Wallet
         fields = '__all__'
