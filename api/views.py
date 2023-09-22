@@ -164,8 +164,8 @@ def VMGet(request, cluster_id, vm_name, vm_namespace):
 @api_view(['POST'])
 def VMCreate(request, cluster_id):
     # first check if user is authenticated
-    # if not request.user.is_authenticated:
-    #     return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
+    if not request.user.is_authenticated:
+        return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
     # feed into the serializer
     serializer = VMCreateSerializer(data=request.data)
     if not serializer.is_valid():
