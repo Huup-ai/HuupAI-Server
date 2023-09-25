@@ -56,6 +56,13 @@ def getClusterByName(requrest,cluster_id):
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+@api_view(['GET'])
+def get_cluster_price(request, cluster_id):
+    try:
+        pricing_instance = Pricing.objects.get(cluster_id=cluster_id)
+        return Response({"price": pricing_instance.price}, status=status.HTTP_200_OK)
+    except Pricing.DoesNotExist:
+        return Response({"error": "Cluster ID not found"}, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['POST'])
 def setPrice(request):
@@ -150,13 +157,9 @@ def VMGet(request, cluster_id, vm_name, vm_namespace):
             json=json,
             verify=CERT
         )
-        if 200 <= res.status_code <= 299:
-            if res.headers.get('content-type') == 'application/json':
-                return JsonResponse(res.json())
-            return HttpResponse(res.content, status=res.status_code)
-        else:
-            return Response({'error': 'Bad Request'}, status=status.HTTP_400_BAD_REQUEST)
-    
+        res.raise_for_status()
+        return Response(res.content, status=res.status_code)
+
     except requests.RequestException as e:  # Catching specific requests exceptions
         return Response({"error": str(e)}, status=500)
 
@@ -225,7 +228,7 @@ def VMUpdate(request, cluster_id, vm_name, vm_namespace):
             update_instance(instance, action)
             
         else:
-            return Response({'error': 'Bad Request'}, status=status.HTTP_400_BAD_REQUEST)
+            Response(res.content, status=res.status_code)
     except Instance.DoesNotExist:
         return Response({"error": "Instance not found."}, status=status.HTTP_404_NOT_FOUND)
     except requests.RequestException as e:  # Catching specific requests exceptions
@@ -257,7 +260,7 @@ def VMTerminate(request, cluster_id, vm_name, vm_namespace):
         # If the request was successful, update the instance.
         if res.status_code == 200:
             update_instance(instance, "terminated")
-            return JsonResponse(res.json())
+            return Response(res.content, status=res.status_code)
         else:
             return HttpResponse(res.content, status=res.status_code)
         
@@ -342,6 +345,12 @@ class UserUpdateRetrieveView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+class UserPaymentMethodView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = self.request.user
+        return Response({"payment_method": user.payment_method}, status=status.HTTP_200_OK)
 ###################################   INVENTORY API    #####################################
 @api_view(['POST'])
 def getSshKey(request, cluster_id):

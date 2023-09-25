@@ -56,7 +56,7 @@ def start_instance(user, spec, cluster_id):
 
     # Creating an instance with the merged data
     instance = Instance.objects.create(**data)
-    
+
     return instance
 
 

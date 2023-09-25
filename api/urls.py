@@ -9,11 +9,13 @@ urlpatterns = [
     path('users/register/', UserRegistrationAPI.as_view(), name='user-register'),
     path('provider/login/', ProviderLoginOrRegisterView.as_view(), name='provider-login'),
     path('users/info/', UserUpdateRetrieveView.as_view(), name='user-info'),
+    path('users/payment_method/', UserPaymentMethodView.as_view(), name='get-payment-method'),
     
     path('clusters/', getAllCluster, name='cluster-list'),
     path('clusters/cluster_name/<str:cluster_id>/', getClusterByName, name='cluster-detail'),
     path('clusters/my_clusters/', getClusterByUser, name='my-cluster'),
     path('clusters/set_price/', setPrice, name='set-price'),
+    path('clusters/get_price/<str:cluster_id>/', get_cluster_price, name='get-cluster-price'),
 
     path('instances/<str:cluster_id>/getvmstatus/<str:name_space>/<str:vm_name>/',VMGet, name = 'vm-get-status'),
     path('instances/<str:email>/get_instances/', getInstances, name='get-instances'),
