@@ -15,7 +15,6 @@ import requests
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
-from django.shortcuts import redirect
 from .models import *
 from .serializers import *
 from .src.helper import *
@@ -27,9 +26,9 @@ from django.contrib.auth import login, logout, authenticate
 from rest_framework.permissions import IsAuthenticated
 from django.db import transaction
 
-
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.tokens import RefreshToken
 
 ###################################   Cluster API   #####################################
 @api_view(['GET'])
@@ -357,8 +356,15 @@ class UserPaymentMethodView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        user = self.request.user
-        return Response({"payment_method": user.payment_method}, status=status.HTTP_200_OK)
+        email = request.query_params.get('email')
+        if not email:
+            return Response({"error": "Email is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(email=email)
+            return Response({"email": user.email, "payment_method": user.payment_method}, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 ###################################   INVENTORY API    #####################################
 @api_view(['POST'])
 def getSshKey(request, cluster_id):
