@@ -299,15 +299,17 @@ class ProviderLoginOrRegisterView(APIView):
             # Check if user exists
             user = User.objects.filter(email=email).first()
             if user:
-                # Authenticate and login the user
-                user = authenticate(request, username=email, password=password)
-                if user:
-                    login(request, user)
-                    return Response({"message": "Login successful"}, status=status.HTTP_200_OK)
+                # Authenticate the user without session login
+                if user.check_password(password):
+                    refresh = RefreshToken.for_user(user)
+                    return Response({
+                        'refresh': str(refresh),
+                        'access': str(refresh.access_token),
+                    })
                 else:
                     return Response({"error": "Invalid password"}, status=status.HTTP_400_BAD_REQUEST)
             else:
-                # Register the user with api
+                # Register the user with the external API
                 response = requests.post('https://edgesphere.szsciit.com/v3-public/localProviders/local?action=login', 
                                          data={'username': email, 
                                                'password': password, 
@@ -322,8 +324,14 @@ class ProviderLoginOrRegisterView(APIView):
                         token = cookies.split(';')[0].split('=')[1]
                         user.token = token
                     user.save()
-                    login(request, user)
-                    return Response({"message": "Registration and login successful"}, status=status.HTTP_201_CREATED)
+
+                    # Generate JWT tokens for the new user
+                    refresh = RefreshToken.for_user(user)
+                    return Response({
+                        'refresh': str(refresh),
+                        'access': str(refresh.access_token),
+                        "message": "Registration successful"
+                    }, status=status.HTTP_201_CREATED)
                 else:
                     return Response({"error": "External service registration failed"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
@@ -427,6 +435,8 @@ def add_or_update_wallet(request):
             # If the user is a provider, update the existing wallet address
             if is_provider:
                 Wallet.objects.filter(user=request.user, is_provider=True).delete()
+            else:
+                Wallet.objects.filter(address=request.address, is_provider=False).delete()
             
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
