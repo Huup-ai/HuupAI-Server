@@ -308,6 +308,9 @@ class ProviderLoginOrRegisterView(APIView):
                         })
                     else:
                         return Response({"error": "Invalid password"}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    Response({"message":"user is not a provider"})
+
             else:
                 # Register the user with the external API
                 response = requests.post('https://edgesphere.szsciit.com/v3-public/localProviders/local?action=login', 
