@@ -442,7 +442,7 @@ def add_or_update_wallet(request):
             if is_provider:
                 Wallet.objects.filter(user=request.user, is_provider=True).delete()
             else:
-                Wallet.objects.filter(address=request.address, is_provider=False).delete()
+                Wallet.objects.filter(address=serializer.validated_data.get('address'), is_provider=False).delete()
             
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
