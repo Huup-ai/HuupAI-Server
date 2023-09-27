@@ -298,15 +298,16 @@ class ProviderLoginOrRegisterView(APIView):
             # Check if user exists
             user = User.objects.filter(email=email).first()
             if user:
-                # Authenticate the user without session login
-                if user.check_password(password):
-                    refresh = RefreshToken.for_user(user)
-                    return Response({
-                        'refresh': str(refresh),
-                        'access': str(refresh.access_token),
-                    })
-                else:
-                    return Response({"error": "Invalid password"}, status=status.HTTP_400_BAD_REQUEST)
+                if user.is_provider:
+                    # Authenticate the user without session login
+                    if user.check_password(password):
+                        refresh = RefreshToken.for_user(user)
+                        return Response({
+                            'refresh': str(refresh),
+                            'access': str(refresh.access_token),
+                        })
+                    else:
+                        return Response({"error": "Invalid password"}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 # Register the user with the external API
                 response = requests.post('https://edgesphere.szsciit.com/v3-public/localProviders/local?action=login', 
