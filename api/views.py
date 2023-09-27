@@ -287,7 +287,7 @@ class ProviderLoginOrRegisterView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request, format=None):
-        email = request.data.get('email')
+        email = request.data.get('username')
         password = request.data.get('password')
 
         # Validate the input data
@@ -332,7 +332,7 @@ class ProviderLoginOrRegisterView(APIView):
                         "message": "Registration successful"
                     }, status=status.HTTP_201_CREATED)
                 else:
-                    return Response({"error": "External service registration failed"}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response(response.content, status=response.status_code)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
