@@ -289,7 +289,6 @@ class ProviderLoginOrRegisterView(APIView):
     def post(self, request, format=None):
         email = request.data.get('username')
         password = request.data.get('password')
-
         # Validate the input data
         if not email or not password:
             return Response({"error": "Email and password are required"}, status=status.HTTP_400_BAD_REQUEST)
@@ -309,7 +308,7 @@ class ProviderLoginOrRegisterView(APIView):
                     else:
                         return Response({"error": "Invalid password"}, status=status.HTTP_400_BAD_REQUEST)
                 else:
-                    Response({"message":"user is not a provider"})
+                    return Response({"error":"user is not a provider"})
 
             else:
                 # Register the user with the external API
@@ -339,7 +338,7 @@ class ProviderLoginOrRegisterView(APIView):
                     return Response(response.content, status=response.status_code)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+        
 class UserUpdateRetrieveView(APIView):
     permission_classes = (permissions.AllowAny,)
 
