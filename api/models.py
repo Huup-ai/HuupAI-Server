@@ -39,6 +39,7 @@ class User(AbstractUser):
     invoice_date = models.DateTimeField(auto_now_add=True)
     company = models.CharField(max_length=255, blank=True, null=True)
     is_provider = models.BooleanField(default=False)
+    is_audit = models.BooleanField(default=False)
     ein = models.CharField(max_length=15, blank=True, null=True, help_text="Employer Identification Number")
     address = models.TextField(blank=True, null=True)
     payment_method = models.CharField(max_length=50, blank=True, null=True)
