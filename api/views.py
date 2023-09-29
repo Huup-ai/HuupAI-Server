@@ -12,6 +12,7 @@ CERT = os.path.join(os.path.dirname(__file__), 'certificate.pem')
 
 
 import requests
+import json
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
@@ -34,15 +35,32 @@ from rest_framework_simplejwt.tokens import RefreshToken
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def getAllCluster(request):
-    # try:
         res = requests.get('https://edgesphere.szsciit.com/v1/management.cattle.io.clusters',cookies=COOKIES,headers={}, verify=CERT)
         if 200 <= res.status_code <= 299:
-            return HttpResponse(res.content, status=res.status_code)
+            res = res.json()
+            items = res.get('data')
         else:
             return Response({'error': 'Bad Request'}, status=status.HTTP_400_BAD_REQUEST)
-    # except:
-    #     return Response(status=status.HTTP_404_NOT_FOUND)
 
+        result_list = []
+        for item in items:
+            item_id = item.get('id')
+            region = item.get('metadata',{}).get('labels',{}).get('region')
+            allocatable = item.get('status',{}).get('allocatable',{})
+            cpu = allocatable.get('cpu','N/A')
+            memory = allocatable.get('memory','N/A')
+            pods = allocatable.get('pods','N/A')
+
+            result_dict = {
+                "id": item_id,
+                "region": region,
+                "cpu": cpu,
+                "memory": memory,
+                "pods": pods
+            }
+            # Append the dictionary to the result list
+            result_list.append(result_dict)
+        return JsonResponse(result_list, safe=False)
 
 @api_view(['GET'])
 def getClusterByName(requrest,cluster_id):

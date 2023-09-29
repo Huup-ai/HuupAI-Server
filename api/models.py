@@ -81,7 +81,7 @@ class Instance(models.Model):
     
     def __str__(self):
         return f"Instance {self.vm_name} created by {self.user_id}"
-    
+
 
 class Wallet(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
