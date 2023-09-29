@@ -70,6 +70,7 @@ class Instance(models.Model):
     instance_id = models.AutoField(primary_key=True)
     user_id = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='user_instances')
     provider_id = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='provider_instances', null=True, blank=True)
+    payment_method = models.CharField(max_length=50, blank=True, null=True)
     cluster = models.CharField(max_length=100, unique=False, null=False)
     vm_name = models.CharField(max_length=100, unique=True, null=False)
     vm_namespace = models.CharField(max_length=100, blank=True, null=True)

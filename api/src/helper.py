@@ -33,6 +33,7 @@ def start_instance(user, spec, cluster_id):
         'user_id': user,
         'vm_name': spec.get("name"),
         'vm_namespace': spec.get("namespace"),
+        'payment_method':spec.get("payment_method")
     }
     try:
         # Find the price from the Pricing table using the cluster_id
