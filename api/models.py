@@ -40,12 +40,8 @@ class User(AbstractUser):
     company = models.CharField(max_length=255, blank=True, null=True)
     is_provider = models.BooleanField(default=False)
     is_audit = models.BooleanField(default=False)
-    ein = models.CharField(max_length=15, blank=True, null=True, help_text="Employer Identification Number")
     address = models.TextField(blank=True, null=True)
     payment_method = models.CharField(max_length=50, blank=True, null=True)
-    card_number = models.CharField(max_length=16, blank=True, null=True)
-    card_exp = models.DateField(blank=True, null=True)
-    card_name = models.CharField(max_length=255, blank=True, null=True)
     tax = models.FloatField(blank=True, null=True)
     role = models.CharField(max_length=255, blank=True, null=True)
     token = models.CharField(max_length=255, blank=True, null=True)
@@ -58,8 +54,11 @@ class User(AbstractUser):
 
 class Invoice(models.Model):
     invoice_id = models.AutoField(primary_key=True)
+    instance = models.ForeignKey('Instance', on_delete=models.CASCADE, related_name='invoices')
     invoice_time = models.DateTimeField()
-    invoice_data = models.TextField(help_text="JSON formatted invoice data")
+    price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Price of the instance per hour or unit")
+    usage = models.DecimalField(max_digits=10, decimal_places=2, help_text="Number of hours or units used")
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Total price including tax")
     user_id = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     paid = models.BooleanField(default=False)
     

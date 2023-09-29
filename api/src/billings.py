@@ -29,21 +29,21 @@ def daily_billing():
                     total_price = round(instance.price * usage_hours + tax, 2)
                     
                     # Create an invoice with this data
-                    invoice_data = {
-                        'price': str(instance.price),
-                        'usage': usage_hours,
-                        'tax': tax,
-                        'total_price': total_price,
-                        'paid':False,
-                    }
                     Invoice.objects.create(
-                        user_id=user,
+                        user=user,
+                        instance=instance,
                         invoice_time=timezone.now(),
-                        invoice_data=json.dumps(invoice_data)
+                        price=instance.price,
+                        usage=usage_hours,
+                        tax=tax,
+                        total_price=total_price,
+                        paid=False
                     )
+                    
                     instance.usage = 0.0
                     instance.start_time = timezone.now()
                     to_update_instances.append(instance)
+                    
                 except Exception as e:
                     # Handle exception appropriately (Logging recommended)
                     print(f"Error processing instance ID {instance.id}: {e}")
