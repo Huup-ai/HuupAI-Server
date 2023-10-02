@@ -43,6 +43,7 @@ def getAllCluster(request):
             return Response({'error': 'Bad Request'}, status=status.HTTP_400_BAD_REQUEST)
 
         result_list = []
+        Cluster.objects.all().delete()
         for item in items:
             item_id = item.get('id')
             region = item.get('metadata',{}).get('labels',{}).get('region')
@@ -67,7 +68,6 @@ def getAllCluster(request):
             }
 
             # Update the clusters database
-            Cluster.objects.all().delete()
             cluster = Cluster.objects.create(
             item_id=item_id,
             region=region,
@@ -537,3 +537,5 @@ def add_or_update_wallet(request):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
         return Response({'error': 'User not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+
+###################################   STRIPE API    #####################################

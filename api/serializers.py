@@ -7,7 +7,11 @@ User = get_user_model()
 class InstanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Instance
-        fields = '__all__'
+        fields = [
+            'instance_id','cluster', 'vm_name',
+            'status', 'usage', 'price', 'payment'
+        ]
+        depth = 1
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
