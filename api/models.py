@@ -51,6 +51,10 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
+class StripeCustomer(models.Model):
+    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
+    stripe_customer_id = models.CharField(max_length=255)
+    stripe_payment = models.CharField(max_length=255, null=True, blank=True)
 
 class Invoice(models.Model):
     invoice_id = models.AutoField(primary_key=True)

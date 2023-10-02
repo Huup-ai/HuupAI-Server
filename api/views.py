@@ -51,12 +51,19 @@ def getAllCluster(request):
             memory = allocatable.get('memory','N/A')
             pods = allocatable.get('pods','N/A')
 
+            try:
+                price_obj = Pricing.objects.get(cluster_id=item_id)
+                price = price_obj.price
+            except Pricing.DoesNotExist:
+                price = 1
+
             result_dict = {
                 "id": item_id,
                 "region": region,
                 "cpu": cpu,
                 "memory": memory,
-                "pods": pods
+                "pods": pods,
+                "price":price
             }
             # Append the dictionary to the result list
             result_list.append(result_dict)
@@ -123,14 +130,11 @@ def getClusterByUser(request):
     
 ###################################   VM API    #####################################
 @api_view(['GET'])
-def getInstances(request, email):
+def getInstances(request):
     if not request.user.is_authenticated:
         return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
     
-    # Verify the email parameter matches the authenticated user's email
-    if request.user.email.lower() != email.lower():
-        return Response({"error": "Email parameter does not match authenticated user's email."}, status=status.HTTP_400_BAD_REQUEST)
-    
+
     instances = Instance.objects.filter(user_id=request.user)
     
     # Update the usage field for each instance
@@ -384,6 +388,23 @@ class UserPaymentMethodView(APIView):
         try:
             user = User.objects.get(email=email)
             return Response({"email": user.email, "payment_method": user.payment_method}, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    def post(self, request):
+        email = request.query_params.get('email')
+        payment_method = request.data.get('payment_method')
+        if not payment_method:
+            return Response({"error": "Payment method is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(email=email)
+            user.payment_method = payment_method
+            user.save()
+
+            return Response({
+                "message": "Payment method updated successfully"
+            }, status=status.HTTP_200_OK)
         except ObjectDoesNotExist:
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 ###################################   INVENTORY API    #####################################
