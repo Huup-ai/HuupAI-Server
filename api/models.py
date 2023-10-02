@@ -10,7 +10,7 @@ class Pricing(models.Model):
     
     def __str__(self):
         return f"Pricing {self.pricing_id}"
-
+                                   
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
