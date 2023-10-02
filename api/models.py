@@ -42,6 +42,7 @@ class User(AbstractUser):
     is_audit = models.BooleanField(default=False)
     address = models.TextField(blank=True, null=True)
     payment_method = models.CharField(max_length=50, blank=True, null=True)
+    credit_card = models.CharField(max_length=4, blank=True, null=True)
     tax = models.FloatField(blank=True, null=True)
     role = models.CharField(max_length=255, blank=True, null=True)
     token = models.CharField(max_length=255, blank=True, null=True)
@@ -55,6 +56,18 @@ class StripeCustomer(models.Model):
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
     stripe_customer_id = models.CharField(max_length=255)
     stripe_payment = models.CharField(max_length=255, null=True, blank=True)
+
+class Cluster(models.Model):
+    item_id = models.CharField(max_length=255, unique=True)
+    region = models.CharField(max_length=255, null=True, blank=True)
+    cpu = models.CharField(max_length=255, null=True, blank=True)
+    memory = models.CharField(max_length=255, null=True, blank=True)
+    pods = models.CharField(max_length=255, null=True, blank=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    provider = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Cluster {self.item_id} - {self.region}"
 
 class Invoice(models.Model):
     invoice_id = models.AutoField(primary_key=True)
@@ -74,7 +87,7 @@ class Instance(models.Model):
     user_id = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='user_instances')
     provider_id = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='provider_instances', null=True, blank=True)
     payment_method = models.CharField(max_length=50, blank=True, null=True)
-    cluster = models.CharField(max_length=100, unique=False, null=False)
+    cluster = models.ForeignKey(Cluster, on_delete=models.CASCADE)
     vm_name = models.CharField(max_length=100, unique=True, null=False)
     vm_namespace = models.CharField(max_length=100, blank=True, null=True)
     status = models.CharField(max_length=100)
@@ -85,7 +98,6 @@ class Instance(models.Model):
     
     def __str__(self):
         return f"Instance {self.vm_name} created by {self.user_id}"
-
 
 class Wallet(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)

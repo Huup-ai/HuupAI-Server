@@ -65,6 +65,18 @@ def getAllCluster(request):
                 "pods": pods,
                 "price":price
             }
+
+            # Update the clusters database
+            Cluster.objects.all().delete()
+            cluster = Cluster.objects.create(
+            item_id=item_id,
+            region=region,
+            cpu=cpu,
+            memory=memory,
+            pods=pods,
+            price=price,
+            provider=None
+        )
             # Append the dictionary to the result list
             result_list.append(result_dict)
         return JsonResponse(result_list, safe=False)
@@ -151,6 +163,24 @@ def getInstances(request):
     serializer = InstanceSerializer(instances, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+@api_view(['GET'])
+def getAllUsage(request):
+    instances = Instance.objects.filter(user_id=request.user)
+
+    with transaction.atomic():
+        # Update the usage and start_time for all instances
+        for instance in instances:
+            time_delta = timezone.now() - instance.start_time
+            instance.usage += round(time_delta.total_seconds() / 3600,2)
+            instance.start_time = timezone.now()
+            instance.save()
+
+    # Fetch instance IDs for which there are unpaid invoices
+    unpaid_instance_ids = Invoice.objects.filter(instance__in=instances, is_paid=False).values_list('instance_id', flat=True)
+
+    result_list = [{'instance_id': i.id, 'usage': i.usage} for i in instances if i.id in unpaid_instance_ids]
+
+    return JsonResponse(result_list, safe=False)
 
 @api_view(['POST'])
 def VMGet(request, cluster_id, vm_name, vm_namespace):
