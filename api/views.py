@@ -9,10 +9,12 @@ The COOKIES IS FOR SUPERUSER ONLY
 import os
 COOKIES = {'R_SESS':'token-test01:62fwdpv2npks9vb4qbcjstzkrl98m6zc68tqrdmdkrdr4hjmtf98fz'}# DELETE THIS IN PRODUCTION USE
 CERT = os.path.join(os.path.dirname(__file__), 'certificate.pem')
+STRIPE_API = 'sk_test_51NT86tLM79TglgywZ5DMu5q9nOyWvxzDLbdqLOeAClOAYRa823nz347d4kiNJ6TbTCLL03MQYlGllK0ooGZHcdAG00H48pWjm0'
 
 
 import requests
 import json
+import stripe
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
@@ -539,3 +541,55 @@ def add_or_update_wallet(request):
         return Response({'error': 'User not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
 
 ###################################   STRIPE API    #####################################
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def check_payment_auth(request):
+    user = request.user
+
+    # Check if user is in StripeCustomer table
+    try:
+        stripe_customer = StripeCustomer.objects.get(user=user)
+    except StripeCustomer.DoesNotExist:
+        return Response({"error": "User is not associated with a Stripe Customer"}, status=status.HTTP_404_NOT_FOUND)
+
+    # Assuming the payment method is stored in stripe_payment
+    payment_method_id = stripe_customer.stripe_payment
+
+    if not payment_method_id:
+        return Response({"error": "No payment method found for user"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Now, create a SetupIntent using Stripe API to check if payment can be authorized
+    stripe.api_key = STRIPE_API
+
+    try:
+        setup_intent = stripe.SetupIntent.create(
+            payment_method=payment_method_id,
+        )
+
+        if setup_intent.status == "succeeded":
+            return Response({"message": "Payment method is valid"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Payment method validation failed"}, status=status.HTTP_400_BAD_REQUEST)
+
+    except stripe.error.StripeError as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def set_stripe_data(request):
+    user = request.user
+    stripe_customer_id = request.data.get('stripe_customer_id')
+    stripe_payment = request.data.get('stripe_payment')
+
+    if not stripe_customer_id or not stripe_payment:
+        return Response({"error": "Both stripe_customer_id and stripe_payment are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # If the user already has a StripeCustomer record, update it. Otherwise, create a new one.
+    stripe_customer, created = StripeCustomer.objects.get_or_create(user=user, defaults={'stripe_customer_id': stripe_customer_id, 'stripe_payment': stripe_payment})
+
+    if not created:
+        stripe_customer.stripe_customer_id = stripe_customer_id
+        stripe_customer.stripe_payment = stripe_payment
+        stripe_customer.save()
+
+    return Response({"message": "Stripe data set successfully"}, status=status.HTTP_200_OK)

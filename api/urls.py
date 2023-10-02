@@ -25,10 +25,13 @@ urlpatterns = [
     path('instances/<str:cluster_id>/updatevm/',VMUpdate, name = 'vm-update'),
     path('instances/<str:cluster_id>/vmterminate/<str:name_space>/<str:vm_name>/',VMTerminate, name = 'vm-terminate'),
 
-    path('Inventory/getsshkey/<str:cluster_id>/', getSshKey, name='get-ssh-key'),
+    path('inventory/getsshkey/<str:cluster_id>/', getSshKey, name='get-ssh-key'),
     path('invoices/get_user_invoices/', get_invoices, name='get-invoices'),
     path('invoices/pay/<int:invoice_id>/', pay_invoice, name='pay-invoice'),
     
+    path('invoices/check_payment_auth/', check_payment_auth, name='check-payment-auth'),
+    path('invoices/add_payment_auth/', set_stripe_data, name='set-stripe-data'),
+
     path('wallets/get_wallets/', get_wallets, name='get-wallets'),
     path('wallet/add/', add_or_update_wallet, name='add-or-update-wallet'),
     ]
