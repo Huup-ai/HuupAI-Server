@@ -578,18 +578,35 @@ def check_payment_auth(request):
 @permission_classes([IsAuthenticated])
 def set_stripe_data(request):
     user = request.user
-    stripe_customer_id = request.data.get('stripe_customer_id')
     stripe_payment = request.data.get('stripe_payment')
 
-    if not stripe_customer_id or not stripe_payment:
-        return Response({"error": "Both stripe_customer_id and stripe_payment are required"}, status=status.HTTP_400_BAD_REQUEST)
+    if not stripe_payment:
+        return Response({"error": "stripe payment_method token is required"}, status=status.HTTP_400_BAD_REQUEST)
 
     # If the user already has a StripeCustomer record, update it. Otherwise, create a new one.
     stripe_customer, created = StripeCustomer.objects.get_or_create(user=user, defaults={'stripe_customer_id': stripe_customer_id, 'stripe_payment': stripe_payment})
 
     if not created:
-        stripe_customer.stripe_customer_id = stripe_customer_id
-        stripe_customer.stripe_payment = stripe_payment
-        stripe_customer.save()
+        try:
+            # If stripe_customer_id is empty, create a new customer in Stripe
+            if not stripe_customer.stripe_customer_id:
+                customer = stripe.Customer.create(email=user.email)
+                stripe_customer.stripe_customer_id = customer['id']
+            
+            # Attach the PaymentMethod to the customer
+            stripe.PaymentMethod.attach(
+                stripe_payment,
+                customer=stripe_customer.stripe_customer_id
+            )
+            # # Optionally, set it as the default payment method
+            # stripe.Customer.modify(
+            #     stripe_customer.stripe_customer_id,
+            #     invoice_settings={"default_payment_method": stripe_payment}
+            # )
+
+            stripe_customer.stripe_payment = stripe_payment
+            stripe_customer.save()
+        except stripe.error.StripeError as e:
+            print(f"Stripe error: {str(e)}")
 
     return Response({"message": "Stripe data set successfully"}, status=status.HTTP_200_OK)
