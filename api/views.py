@@ -165,7 +165,7 @@ def getInstances(request):
 
 @api_view(['GET'])
 def getAllUsage(request):
-    instances = Instance.objects.filter(user_id=request.user)
+    instances = Instance.objects.select_related('cluster').filter(user_id=request.user)
 
     with transaction.atomic():
         # Update the usage and start_time for all instances
@@ -178,7 +178,22 @@ def getAllUsage(request):
     # Fetch instance IDs for which there are unpaid invoices
     unpaid_instance_ids = Invoice.objects.filter(instance__in=instances, is_paid=False).values_list('instance_id', flat=True)
 
-    result_list = [{'instance_id': i.id, 'usage': i.usage} for i in instances if i.id in unpaid_instance_ids]
+    result_list = [
+        {
+            'instance_id': i.id, 
+            'usage': i.usage, 
+            'cluster': {
+                'item_id': i.cluster.item_id,
+                'region': i.cluster.region,
+                'cpu': i.cluster.cpu,
+                'memory': i.cluster.memory,
+                'pods': i.cluster.pods,
+                'price': i.cluster.price,
+            },
+            'total_price':i.usage*i.cluster.price
+        } 
+        for i in instances if i.id in unpaid_instance_ids
+    ]
 
     return JsonResponse(result_list, safe=False)
 
@@ -460,7 +475,7 @@ def get_invoices(request):
         if not request.user.is_authenticated:
             return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
         # Get all the invoices for the authenticated user
-        invoices = Invoice.objects.filter(user_id=request.user)
+        invoices = Invoice.objects.filter(user_id=request.user, paid = False)
         
         # Serialize the invoice data
         serializer = InvoiceSerializer(invoices, many=True)
