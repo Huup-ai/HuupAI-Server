@@ -564,6 +564,7 @@ def check_payment_auth(request):
     try:
         setup_intent = stripe.SetupIntent.create(
             payment_method=payment_method_id,
+            customer=stripe_customer.stripe_customer_id,
         )
 
         if setup_intent.status == "succeeded":
