@@ -595,7 +595,7 @@ def set_stripe_data(request):
         stripe_customer = StripeCustomer.objects.create(
             user=user,
             stripe_customer_id=customer['id'],
-            stripe_payment_method=stripe_payment
+            stripe_payment=stripe_payment
         )
 
     # Check whether the payment method needs to be updated
