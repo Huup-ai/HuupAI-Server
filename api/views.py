@@ -579,6 +579,7 @@ def check_payment_auth(request):
 def set_stripe_data(request):
     user = request.user
     stripe_payment = request.data.get('stripe_payment')
+    stripe.api_key = STRIPE_API
 
     try:
         stripe_customer = StripeCustomer.objects.get(user=request.user)
@@ -592,7 +593,7 @@ def set_stripe_data(request):
 
         # Create a new StripeCustomer in the local DB
         stripe_customer = StripeCustomer.objects.create(
-            user=request.user,
+            user=user,
             stripe_customer_id=customer['id'],
             stripe_payment_method=stripe_payment
         )
