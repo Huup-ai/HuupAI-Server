@@ -585,14 +585,11 @@ def set_stripe_data(request):
         stripe_customer = StripeCustomer.objects.get(user=request.user)
     except StripeCustomer.DoesNotExist:
         # If StripeCustomer does not exist, create a new customer in Stripe
-        try:
-            customer = stripe.Customer.create(
-                email=request.user.email,
-                payment_method=stripe_payment,
-                invoice_settings={'default_payment_method': stripe_payment},
-            )
-        except:
-            Response('token is not valid')
+        customer = stripe.Customer.create(
+            email=request.user.email,
+            payment_method=stripe_payment,
+            invoice_settings={'default_payment_method': stripe_payment},
+        )
 
         # Create a new StripeCustomer in the local DB
         stripe_customer = StripeCustomer.objects.create(
