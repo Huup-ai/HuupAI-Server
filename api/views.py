@@ -375,9 +375,14 @@ class ProviderLoginOrRegisterView(APIView):
                     # Authenticate the user without session login
                     if user.check_password(password):
                         refresh = RefreshToken.for_user(user)
+                        # Check if the user has a wallet
+                        wallet = Wallet.objects.filter(user=user).first()
+                        wallet_address = wallet.address if wallet else None
+                        
                         return Response({
                             'refresh': str(refresh),
                             'access': str(refresh.access_token),
+                            'wallet_address': wallet_address
                         })
                     else:
                         return Response({"error": "Invalid password"}, status=status.HTTP_400_BAD_REQUEST)
