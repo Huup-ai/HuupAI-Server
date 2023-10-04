@@ -53,6 +53,7 @@ def getAllCluster(request):
             cpu = allocatable.get('cpu','N/A')
             memory = allocatable.get('memory','N/A')
             pods = allocatable.get('pods','N/A')
+            virtualization = item.get('metadata',{}).get('labels',{}).get('clusterType','non-virtualization')=='virtualization'
 
             try:
                 price_obj = Pricing.objects.get(cluster_id=item_id)
@@ -66,7 +67,8 @@ def getAllCluster(request):
                 "cpu": cpu,
                 "memory": memory,
                 "pods": pods,
-                "price":price
+                "price":price,
+                "virtualization":virtualization
             }
 
             # Update the clusters database
@@ -77,7 +79,8 @@ def getAllCluster(request):
             memory=memory,
             pods=pods,
             price=price,
-            provider=None
+            provider=None,
+            virtualization = virtualization
         )
             # Append the dictionary to the result list
             result_list.append(result_dict)
@@ -124,22 +127,18 @@ def setPrice(request):
     return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def getClusterByUser(request):
-    # user must be a provider and must be logged in
-    if not request.user.is_authenticated:
-        return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
-    
     user = request.user
+
+    # Assuming User model has a boolean field named 'is_provider'
     if not user.is_provider:
-        return Response({'error': 'Only providers can get clusters'}, status=status.HTTP_403_FORBIDDEN)
-    # try:
-    res = requests.get('https://edgesphere.szsciit.com/v1/management.cattle.io.clusters',cookies=user.token,headers={}, verify=CERT)
-    if 200 <= res.status_code <= 299:
-            return HttpResponse(res.content, status=res.status_code)
-    else:
-        return Response({'error': 'Bad Request'}, status=status.HTTP_400_BAD_REQUEST)
-    # except:
-    #     return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response({"error": "User is not a provider."}, status=status.HTTP_400_BAD_REQUEST)
+
+    clusters = Cluster.objects.filter(provider=user)
+    serializer = ClusterSerializer(clusters, many=True)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
     
 ###################################   VM API    #####################################
@@ -230,7 +229,6 @@ def VMGet(request, cluster_id, vm_name, vm_namespace):
 
     except requests.RequestException as e:  # Catching specific requests exceptions
         return Response({"error": str(e)}, status=500)
-
 
 @api_view(['POST'])
 def VMCreate(request, cluster_id):

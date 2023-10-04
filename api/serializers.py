@@ -30,7 +30,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     username_field = 'email'
     
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -58,8 +57,14 @@ class InvoiceSerializer(serializers.ModelSerializer):
         depth = 1
 
 class WalletSerializer(serializers.ModelSerializer):
+
     user = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Wallet
         fields = '__all__'
+
+class ClusterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cluster
+        fields = ['item_id', 'region', 'cpu', 'memory', 'pods', 'price', 'provider','virtualization']
