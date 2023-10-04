@@ -235,6 +235,14 @@ def VMCreate(request, cluster_id):
     # first check if user is authenticated
     if not request.user.is_authenticated:
         return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
+    # check if the cluster can start a vm
+    try:
+        cluster = Cluster.objects.get(item_id=cluster_id)
+        if not cluster.virtualization:
+            return Response({"error": "Virtualization is not enabled for this cluster."}, status=status.HTTP_400_BAD_REQUEST)
+    except Cluster.DoesNotExist:
+        return Response({"error": "Cluster not found."}, status=status.HTTP_404_NOT_FOUND)
+    
     # feed into the serializer
     serializer = VMCreateSerializer(data=request.data)
     if not serializer.is_valid():
@@ -265,7 +273,6 @@ def VMCreate(request, cluster_id):
         instance.delete()
         return Response(res.content, status=res.status_code)
     
-
 @api_view(['POST'])
 def VMUpdate(request, cluster_id, vm_name, vm_namespace):
     #check if user is anthenticated

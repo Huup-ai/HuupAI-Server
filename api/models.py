@@ -58,7 +58,7 @@ class StripeCustomer(models.Model):
     stripe_payment = models.CharField(max_length=255, null=True, blank=True)
 
 class Cluster(models.Model):
-    item_id = models.CharField(max_length=255, unique=True)
+    item_id = models.CharField(max_length=255, unique=True, default='null')
     region = models.CharField(max_length=255, null=True, blank=True)
     cpu = models.CharField(max_length=255, null=True, blank=True)
     memory = models.CharField(max_length=255, null=True, blank=True)
