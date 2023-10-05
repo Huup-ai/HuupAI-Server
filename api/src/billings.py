@@ -44,7 +44,7 @@ def daily_billing():
                         total_price=total_price,
                         paid=False
                     )
-                    invoices.append(invoice)  # Add the created invoice to our list
+                    invoices.append(invoice)
                     
                     instance.usage = 0.0
                     instance.start_time = timezone.now()

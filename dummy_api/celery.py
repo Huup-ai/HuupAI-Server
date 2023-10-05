@@ -15,10 +15,10 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 @current_app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
     # Runs the daily_billing task every day at midnight
-    from api.src.tasks import daily_billing
+    from api.src.tasks import daily_billing_task
     sender.add_periodic_task(
         crontab(hour=0, minute=0),
-        daily_billing.s(),
+        daily_billing_task.s(),
     )
 
     from api.web3 import check_instance_status

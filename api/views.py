@@ -127,7 +127,6 @@ def setPrice(request):
     return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
 def getClusterByUser(request):
     user = request.user
 
@@ -478,7 +477,7 @@ def getSshKey(request, cluster_id):
         
         # Return the content and status code
         return HttpResponse(res.content, status=res.status_code)
-    except requests.RequestException as e:  # Catching specific requests exceptions
+    except requests.RequestException as e:
         return Response({"error": str(e)}, status=500)
 
 @api_view(['GET'])
@@ -509,15 +508,30 @@ def pay_invoice(request, invoice_id):
         invoice.paid = True
         invoice.save()
         
-        # Reset the invoice table
-        with transaction.atomic():
-            Invoice.objects.filter(paid=True).delete()
+        # # Reset the invoice table
+        # with transaction.atomic():
+        #     Invoice.objects.filter(paid=True).delete()
 
         return Response({'message': 'Invoice paid and table reset successfully'}, status=status.HTTP_200_OK)
     except Invoice.DoesNotExist:
         return Response({'error': 'Invoice not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def provider_get_invoice(request):
+    if not request.user.is_provider:
+        return Response({'error':'User is not a provider, please use get_invoice api'})
+    
+    invoices = Invoice.objects.select_related('instance').filter(instance__provider_id=request.user, is_paid = False)
+    
+    data = [{
+        'vm_name': invoice.instance.vm_name,
+        'usage': invoice.usage,
+        'total_price': invoice.total_price
+    } for invoice in invoices]
+
+    return Response(data)
 
 ###################################   Web3 API    #####################################
 @api_view(['GET'])

@@ -1,5 +1,6 @@
 from web3 import Web3
 import json
+import requests
 from celery import shared_task
 from api.models import *
 from src.helper import *
@@ -31,8 +32,15 @@ def check_instance_status():
                 [instance.user_id.email],
             )
         elif status == 3:
-             update_instance(instance,'terminated')
-             send_mail(
+            try:
+                response = requests.post('https://your_middleware_domain.com/contract/startrental/', data={'instance_id': instance.id})
+                response.raise_for_status()  # This will raise an exception if the response returns an error status code
+            except requests.RequestException as e:
+                # Handle any error related to the API call here
+                print(f"Error stopping rental for instance {instance.id}: {e}")
+            
+            update_instance(instance,'terminated')
+            send_mail(
                 'Instance Terminate Notification',
                 'Your instance is now been terminated',
                 'contact@huupai.xyz',
