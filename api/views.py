@@ -390,10 +390,12 @@ class ProviderLoginOrRegisterView(APIView):
 
             else:
                 # Register the user with the external API
+
                 response = requests.post('https://edgesphere.szsciit.com/v3-public/localProviders/local?action=login', 
                                          data={'username': email, 
                                                'password': password, 
-                                               'responseType':'cookie'},
+                                               'responseType':'cookie',
+                                               'description':'provider log in'},
                                                verify=CERT)
                 if response.status_code == 200:
                     # Create a new user in your database
@@ -410,6 +412,7 @@ class ProviderLoginOrRegisterView(APIView):
                     return Response({
                         'refresh': str(refresh),
                         'access': str(refresh.access_token),
+                        'wallet_address': None,
                         "message": "Registration successful"
                     }, status=status.HTTP_201_CREATED)
                 else:
