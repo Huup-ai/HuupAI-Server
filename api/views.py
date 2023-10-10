@@ -28,10 +28,12 @@ from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth import login, logout, authenticate
 from rest_framework.permissions import IsAuthenticated
 from django.db import transaction
+from django.conf import settings
 
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
+
 
 ###################################   Cluster API   #####################################
 @api_view(['GET'])
@@ -217,6 +219,10 @@ def VMGet(request, cluster_id, vm_name, vm_namespace):
     # If instance exists, make the API call
     json = {'clusterid': cluster_id, 'vmName': vm_name, 'namespace': vm_namespace}
     try:
+        if settings.TEST_MODE:
+            serializer = InstanceSerializer(instance)
+            return Response(serializer.data)
+        
         res = requests.post(
             f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/kubevirt.io.virtualmachine/{vm_namespace}/{vm_name}",
             cookies=COOKIES,
@@ -257,16 +263,19 @@ def VMCreate(request, cluster_id):
     except Exception as e:
         return Response({"error": f"Cannot create the instance in the database: {e}"}, status=status.HTTP_400_BAD_REQUEST)
     try:
-        # Try to make the API call
-        res = requests.post(
-            f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/kubevirt.io.virtualmachine",
-            cookies=COOKIES,
-            json=payload, 
-            verify=CERT
-        )
-        res.raise_for_status()
-        # If the API call was successful, return a success response
-        return Response(res.content, status=res.status_code)
+        # Try to make the API call if not in test mode
+        if not settings.TEST_MODE:
+            res = requests.post(
+                f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/kubevirt.io.virtualmachine",
+                cookies=COOKIES,
+                json=payload, 
+                verify=CERT
+            )
+            res.raise_for_status()
+            # If the API call was successful, return a success response
+            return Response(res.content, status=res.status_code)
+        else:
+            return Response({"message": "Instance has been created"}, status=status.HTTP_200_OK)
     except Exception as err:
         # If the API call was not successful, delete the database instance
         instance.delete()
@@ -285,22 +294,25 @@ def VMUpdate(request, cluster_id, vm_name, vm_namespace):
     action = serializer.validated_data['action']
 
     try:
-        res = requests.post(
-            f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/kubevirt.io.virtualmachine/{vm_namespace}/{vm_name}?action={action}",
-            cookies=COOKIES,
-            json={"cluster_id": cluster_id, "action": action, "vmName":vm_name, "namespace":vm_namespace},
-            verify=CERT
-        )
+        if not settings.TEST_MODE:
+            res = requests.post(
+                f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/kubevirt.io.virtualmachine/{vm_namespace}/{vm_name}?action={action}",
+                cookies=COOKIES,
+                json={"cluster_id": cluster_id, "action": action, "vmName":vm_name, "namespace":vm_namespace},
+                verify=CERT
+            )
 
-        if res.status_code == 200:
+        if settings.TEST_MODE or res.status_code == 200:
             # Retrieve the corresponding instance
             instance = Instance.objects.get(user_id=request.user, vm_name=vm_name)
             
             # Update the instance using src helper function
             update_instance(instance, action)
+            return Response({"message": "Update successfully"}, status=status.HTTP_200_OK)
             
         else:
-            Response(res.content, status=res.status_code)
+            return Response(res.content, status=res.status_code)
+        
     except Instance.DoesNotExist:
         return Response({"error": "Instance not found."}, status=status.HTTP_404_NOT_FOUND)
     except requests.RequestException as e:  # Catching specific requests exceptions
@@ -322,19 +334,20 @@ def VMTerminate(request, cluster_id, vm_name, vm_namespace):
 
         # if instance exists, send the request to terminate the VM in the cloud
         json = {'clusterid': cluster_id, 'vmName': vm_name, 'namespace': vm_namespace}
-        res = requests.post(
-            f"wss://edgesphere.szsciit.com/wsproxy/k8s/clusters/{cluster_id}/apis/subresources.kubevirt.io/v1/namespaces/{vm_namespace}/virtualmachineinstances/{vm_name}/vnc",
-            cookies=COOKIES,
-            json=json,
-            verify=CERT
-        )
-        
-        # If the request was successful, update the instance.
-        if res.status_code == 200:
+        if not settings.TEST_MODE:
+            res = requests.post(
+                f"wss://edgesphere.szsciit.com/wsproxy/k8s/clusters/{cluster_id}/apis/subresources.kubevirt.io/v1/namespaces/{vm_namespace}/virtualmachineinstances/{vm_name}/vnc",
+                cookies=COOKIES,
+                json=json,
+                verify=CERT
+            )
+            
+        # If TEST_MODE or the request was successful, update the instance.
+        if settings.TEST_MODE or res.status_code == 200:
             update_instance(instance, "terminated")
-            return Response(res.content, status=res.status_code)
+            return Response({"message": "Instance terminate successfully"}, status=status.HTTP_200_OK)
         else:
-            return HttpResponse(res.content, status=res.status_code)
+            return Response(res.content, status=res.status_code)
         
     except Instance.DoesNotExist:
         return Response({"error": "Instance not found for this user."}, status=404)
