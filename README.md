@@ -28,9 +28,7 @@ After activating myenv, navigate to the project's main directory. Then, use pip 
 ```bash
 python3 -m pip install -r requirements.txt
 ```
-
 ## Run backend
-
 
 
 Start venv and go to the project directory
@@ -49,4 +47,9 @@ python3 manage.py migrate
 Run server:
 ```bash
 python3 manage.py runserver
+```
+
+## Run Testserver (this mode does not call external API)
+```bash
+python3 manage.py runtestserver -m test
 ```
