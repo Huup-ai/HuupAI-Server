@@ -360,7 +360,7 @@ class ProviderLoginOrRegisterView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request, format=None):
-        email = request.data.get('username')
+        email = request.data.get('email')
         password = request.data.get('password')
         # Validate the input data
         if not email or not password:
