@@ -175,6 +175,7 @@ def getInstances(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def getAllUsage(request):
     instances = Instance.objects.select_related('cluster').filter(user_id=request.user)
 
@@ -187,7 +188,7 @@ def getAllUsage(request):
             instance.save()
 
     # Fetch instance IDs for which there are unpaid invoices
-    unpaid_instance_ids = Invoice.objects.filter(instance__in=instances, is_paid=False).values_list('instance_id', flat=True)
+    unpaid_instance_ids = Invoice.objects.filter(instance__in=instances, paid=False).values_list('instance_id', flat=True)
 
     result_list = [
         {
