@@ -493,7 +493,6 @@ class UserPaymentMethodView(APIView):
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 ###################################   INVENTORY API    #####################################
 @api_view(['GET'])
-@permission_classes([AllowAny])
 def getSshKey(request, cluster_id):
     if not settings.TEST_MODE:
         try:
