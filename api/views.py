@@ -34,11 +34,14 @@ from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from pathlib import Path
 
 ###################################   Cluster API   #####################################
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def getAllCluster(request):
+        CUR_DIR = Path(__file__).parent.absolute()
+        CLUSTER_PATH = CUR_DIR /'resources/clusters.json'
         if not settings.TEST_MODE:
             res = requests.get('https://edgesphere.szsciit.com/v1/management.cattle.io.clusters',cookies=COOKIES,headers={}, verify=CERT)
             if 200 <= res.status_code <= 299:
@@ -89,7 +92,10 @@ def getAllCluster(request):
                 result_list.append(result_dict)
             return JsonResponse(result_list, safe=False)
         else:
-            pass
+            with open(CLUSTER_PATH, 'r') as file:
+                result_list = json.load(file)
+            return JsonResponse(result_list, safe=False)
+
 
 @api_view(['GET'])
 def getClusterByName(requrest,cluster_id):
