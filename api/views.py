@@ -495,15 +495,20 @@ class UserPaymentMethodView(APIView):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def getSshKey(request, cluster_id):
-    try:
-        json = {"clusterid":cluster_id}
-        # Making a GET request to the provided URL
-        res = requests.post(f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/cnos.io.sshpublic", cookies=COOKIES, verify=CERT, json = json)
-        
-        # Return the content and status code
-        return HttpResponse(res.content, status=res.status_code)
-    except requests.RequestException as e:
-        return Response({"error": str(e)}, status=500)
+    if not settings.TEST_MODE:
+        try:
+            json_data = {"clusterid":cluster_id}
+            # Making a GET request to the provided URL
+            res = requests.post(f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/cnos.io.sshpublic", cookies=COOKIES, verify=CERT, json = json_data)
+            
+            # Return the content and status code
+            return HttpResponse(res.content, status=res.status_code)
+        except requests.RequestException as e:
+            return Response({"error": str(e)}, status=500)
+    else:
+        with open('api/resources/sshkey.json', 'r') as json_file:
+            data = json.load(json_file)
+            return Response(data,status=200)
 
 @api_view(['GET'])
 def get_invoices(request):
@@ -624,6 +629,7 @@ def check_payment_auth(request):
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def set_stripe_data(request):
     user = request.user
     stripe_payment = request.data.get('stripe_payment')

@@ -1,0 +1,21 @@
+{
+    "type": "collection",
+    "actions": {},
+    "resourceType": "cnos.io.sshpublic",
+    "revision": "75514937",
+    "data": [
+        {
+            "id": "sshpubkey",
+            "type": "cnos.io.sshpublic",
+            "apiVersion": "cnos.io/v1",
+            "kind": "SshPublic",
+            "metadata": {
+                "name": "sshpubkey",
+                "uid": "c9167dc4-b4c3-4959-9796-db2b7a565fbc"
+            },
+            "spec": {
+                "publickey": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDINmmViGZZ0Q2fdvk3eAQPUblPOvDv9jjTVknIfJrL3a8QArhQ7Xw2rERPINC9ExXKClIl/kd3/ClYYjibZzgI5UstgCsOD4LfDnW0pDj/W1jXNuXIhcYo8y9DUu4CzvuZzN1OYmB4FyJyw7/735IEzZVVo1SG+Y6A3Qpvk97IxsPzCa/iX2MaLoWyUqUvViJhlTdiJbgEnFx0WnSBajITCrL63rIO+K/TiyrtTvwQ1frLOVvJEPRPFRkhQAFanRud9k4SgFNbkg3JBdQRIL4C89392y4z/Eh7/gUwGzagLTROedwBcYoZ+zAzQmizq7llpxMpQN0JXNZnuT6j8dspFpQ+QqcrzFXUhEZJiDave9z9Nalr/h31FjsjvjneEkY6+NK4Ttszx2y5d7giU15tHZoO2MKzbeoO9deeZtkYFAhJL0VN6IZd0sqstuaGrffZBTGy+9210ertu8LcQ+BSPNrbqi5d+G4ijbO762PYpoZqb8v+cdZRwlirk1M9m30= root@cnos-001"
+            }
+        }
+    ]
+}
