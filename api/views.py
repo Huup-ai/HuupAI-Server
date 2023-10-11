@@ -177,6 +177,7 @@ def getInstances(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def getAllUsage(request):
+    # Get instances with information relate to cluster
     instances = Instance.objects.select_related('cluster').filter(user_id=request.user)
 
     with transaction.atomic():
