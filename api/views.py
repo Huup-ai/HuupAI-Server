@@ -39,54 +39,57 @@ from rest_framework_simplejwt.tokens import RefreshToken
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def getAllCluster(request):
-        res = requests.get('https://edgesphere.szsciit.com/v1/management.cattle.io.clusters',cookies=COOKIES,headers={}, verify=CERT)
-        if 200 <= res.status_code <= 299:
-            res = res.json()
-            items = res.get('data')
+        if not settings.TEST_MODE:
+            res = requests.get('https://edgesphere.szsciit.com/v1/management.cattle.io.clusters',cookies=COOKIES,headers={}, verify=CERT)
+            if 200 <= res.status_code <= 299:
+                res = res.json()
+                items = res.get('data')
+            else:
+                return Response({'error': 'Bad Request'}, status=status.HTTP_400_BAD_REQUEST)
+
+            result_list = []
+            Cluster.objects.all().delete()
+            for item in items:
+                item_id = item.get('id')
+                region = item.get('metadata',{}).get('labels',{}).get('region')
+                allocatable = item.get('status',{}).get('allocatable',{})
+                cpu = allocatable.get('cpu','N/A')
+                memory = allocatable.get('memory','N/A')
+                pods = allocatable.get('pods','N/A')
+                virtualization = item.get('metadata',{}).get('labels',{}).get('clusterType','non-virtualization')=='virtualization'
+
+                try:
+                    price_obj = Pricing.objects.get(cluster_id=item_id)
+                    price = price_obj.price
+                except Pricing.DoesNotExist:
+                    price = 1
+
+                result_dict = {
+                    "id": item_id,
+                    "region": region,
+                    "cpu": cpu,
+                    "memory": memory,
+                    "pods": pods,
+                    "price":price,
+                    "virtualization":virtualization
+                }
+
+                # Update the clusters database
+                cluster = Cluster.objects.create(
+                item_id=item_id,
+                region=region,
+                cpu=cpu,
+                memory=memory,
+                pods=pods,
+                price=price,
+                provider=None,
+                virtualization = virtualization
+            )
+                # Append the dictionary to the result list
+                result_list.append(result_dict)
+            return JsonResponse(result_list, safe=False)
         else:
-            return Response({'error': 'Bad Request'}, status=status.HTTP_400_BAD_REQUEST)
-
-        result_list = []
-        Cluster.objects.all().delete()
-        for item in items:
-            item_id = item.get('id')
-            region = item.get('metadata',{}).get('labels',{}).get('region')
-            allocatable = item.get('status',{}).get('allocatable',{})
-            cpu = allocatable.get('cpu','N/A')
-            memory = allocatable.get('memory','N/A')
-            pods = allocatable.get('pods','N/A')
-            virtualization = item.get('metadata',{}).get('labels',{}).get('clusterType','non-virtualization')=='virtualization'
-
-            try:
-                price_obj = Pricing.objects.get(cluster_id=item_id)
-                price = price_obj.price
-            except Pricing.DoesNotExist:
-                price = 1
-
-            result_dict = {
-                "id": item_id,
-                "region": region,
-                "cpu": cpu,
-                "memory": memory,
-                "pods": pods,
-                "price":price,
-                "virtualization":virtualization
-            }
-
-            # Update the clusters database
-            cluster = Cluster.objects.create(
-            item_id=item_id,
-            region=region,
-            cpu=cpu,
-            memory=memory,
-            pods=pods,
-            price=price,
-            provider=None,
-            virtualization = virtualization
-        )
-            # Append the dictionary to the result list
-            result_list.append(result_dict)
-        return JsonResponse(result_list, safe=False)
+            pass
 
 @api_view(['GET'])
 def getClusterByName(requrest,cluster_id):
@@ -483,12 +486,9 @@ class UserPaymentMethodView(APIView):
         except ObjectDoesNotExist:
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 ###################################   INVENTORY API    #####################################
-@api_view(['POST'])
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def getSshKey(request, cluster_id):
-
-    if not request.user.is_authenticated:
-        return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
-
     try:
         json = {"clusterid":cluster_id}
         # Making a GET request to the provided URL
@@ -585,7 +585,6 @@ def add_or_update_wallet(request):
 
 ###################################   STRIPE API    #####################################
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
 def check_payment_auth(request):
     user = request.user
 
@@ -619,7 +618,6 @@ def check_payment_auth(request):
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
 def set_stripe_data(request):
     user = request.user
     stripe_payment = request.data.get('stripe_payment')
@@ -657,5 +655,13 @@ def set_stripe_data(request):
         # Update the payment method in the local DB
         stripe_customer.stripe_payment = stripe_payment
         stripe_customer.save()
+
+        # Retrieve the last four digits of the card
+        payment_method_details = stripe.PaymentMethod.retrieve(stripe_payment)
+        last_four = payment_method_details.card.last4
+        
+        # Store the last four digits to the User model's credit_card field
+        user.credit_card = last_four
+        user.save()
 
     return JsonResponse({'status': 'success'}, status=200)
