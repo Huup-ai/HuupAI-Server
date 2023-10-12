@@ -411,7 +411,7 @@ class ProviderLoginOrRegisterView(APIView):
                         return Response({"error": "Invalid password"}, status=status.HTTP_400_BAD_REQUEST)
                 else:
                     return Response({"error":"user is not a provider"})
-
+            # if user not exists
             else:
                 # Register the user with the external API
                 if settings.TEST_MODE:  

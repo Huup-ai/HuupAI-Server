@@ -8,6 +8,7 @@ from django.core.mail import send_mail
 
 @shared_task
 def check_instance_status():
+    print('check_instance_status started:.......\n')
     web3 = Web3(Web3.HTTPProvider('https://sepolia.infura.io/v3/e461f10be30a4c31a421c721e8efeac1'))
     
     with open("./resources/contract.abi", "r") as f:
