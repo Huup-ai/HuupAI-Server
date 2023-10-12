@@ -21,6 +21,6 @@ def setup_periodic_tasks(sender, **kwargs):
         daily_billing_task.s(),
     )
 
-    from api.web3 import check_instance_status
+    from api.web3_task import check_instance_status
     # Runs the check_instance_status every hour
     sender.add_periodic_task(3600.0, check_instance_status.s(), name='Check instance status every hour')
