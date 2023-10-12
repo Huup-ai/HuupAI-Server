@@ -41,7 +41,7 @@ from pathlib import Path
 @permission_classes([AllowAny])
 def getAllCluster(request):
         CUR_DIR = Path(__file__).parent.absolute()
-        CLUSTER_PATH = CUR_DIR /'resources/clusters.json'
+        CLUSTER_PATH = CUR_DIR /'resources/clustersCPU.json'
         if not settings.TEST_MODE:
             res = requests.get('https://edgesphere.szsciit.com/v1/management.cattle.io.clusters',cookies=COOKIES,headers={}, verify=CERT)
             if 200 <= res.status_code <= 299:
@@ -96,6 +96,64 @@ def getAllCluster(request):
                 result_list = json.load(file)
             return JsonResponse(result_list, safe=False)
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def getAllGPUCluster(request):
+        CUR_DIR = Path(__file__).parent.absolute()
+        CLUSTER_PATH = CUR_DIR /'resources/clustersGPU.json'
+        if not settings.TEST_MODE:
+            res = requests.get('https://edgesphere.szsciit.com/v1/management.cattle.io.clusters',cookies=COOKIES,headers={}, verify=CERT)
+            if 200 <= res.status_code <= 299:
+                res = res.json()
+                items = res.get('data')
+            else:
+                return Response({'error': 'Bad Request'}, status=status.HTTP_400_BAD_REQUEST)
+
+            result_list = []
+            Cluster.objects.all().delete()
+            for item in items:
+                item_id = item.get('id')
+                region = item.get('metadata',{}).get('labels',{}).get('region')
+                allocatable = item.get('status',{}).get('allocatable',{})
+                cpu = allocatable.get('gpu','N/A')
+                memory = allocatable.get('memory','N/A')
+                pods = allocatable.get('pods','N/A')
+                virtualization = item.get('metadata',{}).get('labels',{}).get('clusterType','non-virtualization')=='virtualization'
+
+                try:
+                    price_obj = Pricing.objects.get(cluster_id=item_id)
+                    price = price_obj.price
+                except Pricing.DoesNotExist:
+                    price = 1
+
+                result_dict = {
+                    "id": item_id,
+                    "region": region,
+                    "cpu": cpu,
+                    "memory": memory,
+                    "pods": pods,
+                    "price":price,
+                    "virtualization":virtualization
+                }
+
+                # Update the clusters database
+                cluster = Cluster.objects.create(
+                item_id=item_id,
+                region=region,
+                cpu=cpu,
+                memory=memory,
+                pods=pods,
+                price=price,
+                provider=None,
+                virtualization = virtualization
+            )
+                # Append the dictionary to the result list
+                result_list.append(result_dict)
+            return JsonResponse(result_list, safe=False)
+        else:
+            with open(CLUSTER_PATH, 'r') as file:
+                result_list = json.load(file)
+            return JsonResponse(result_list, safe=False)
 
 @api_view(['GET'])
 def getClusterByName(requrest,cluster_id):
