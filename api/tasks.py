@@ -54,4 +54,5 @@ def check_instance_status():
     #             'contact@huupai.xyz',
     #             [instance.user_id.email],
     #         )
+    return
 
