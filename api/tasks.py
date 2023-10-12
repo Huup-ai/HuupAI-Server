@@ -6,6 +6,13 @@ from api.models import *
 from api.src.helper import *
 from django.core.mail import send_mail
 
+from celery import shared_task
+from api.src.billings import *
+
+@shared_task
+def daily_billing_task():
+    return daily_billing()
+
 @shared_task
 def check_instance_status():
     print('check_instance_status started:.......\n')
