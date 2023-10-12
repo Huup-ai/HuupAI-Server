@@ -414,27 +414,10 @@ class ProviderLoginOrRegisterView(APIView):
 
             else:
                 # Register the user with the external API
-
-                response = requests.post('https://edgesphere.szsciit.com/v3-public/localProviders/local?action=login', 
-                                         json={
-                                               "description": "test",
-                                                "password": password,
-                                                "responseType": "cookie",
-                                                "username": email
-                                                },
-                                               verify=CERT,
-                                               cookies=COOKIES)
-                if response.status_code == 200:
-                    # Create a new user in your database
+                if settings.TEST_MODE:  
                     user = User.objects.create(email=email, is_provider=True)
                     user.set_password(password)
-                    cookies = response.headers.get('Set-Cookie')
-                    if cookies:
-                        token = cookies.split(';')[0].split('=')[1]
-                        user.token = token
                     user.save()
-
-                    # Generate JWT tokens for the new user
                     refresh = RefreshToken.for_user(user)
                     return Response({
                         'refresh': str(refresh),
@@ -443,7 +426,35 @@ class ProviderLoginOrRegisterView(APIView):
                         "message": "Registration successful"
                     }, status=status.HTTP_201_CREATED)
                 else:
-                    return Response(response.content, status=response.status_code)
+                    response = requests.post('https://edgesphere.szsciit.com/v3-public/localProviders/local?action=login', 
+                                            json={
+                                                "description": "test",
+                                                    "password": password,
+                                                    "responseType": "cookie",
+                                                    "username": email
+                                                    },
+                                                verify=CERT,
+                                                cookies=COOKIES)
+                    if response.status_code == 200:
+                        # Create a new user in your database
+                        user = User.objects.create(email=email, is_provider=True)
+                        user.set_password(password)
+                        cookies = response.headers.get('Set-Cookie')
+                        if cookies:
+                            token = cookies.split(';')[0].split('=')[1]
+                            user.token = token
+                        user.save()
+
+                        # Generate JWT tokens for the new user
+                        refresh = RefreshToken.for_user(user)
+                        return Response({
+                            'refresh': str(refresh),
+                            'access': str(refresh.access_token),
+                            'wallet_address': None,
+                            "message": "Registration successful"
+                        }, status=status.HTTP_201_CREATED)
+                    else:
+                        return Response(response.content, status=response.status_code)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
