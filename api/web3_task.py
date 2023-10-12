@@ -3,7 +3,7 @@ import json
 import requests
 from celery import shared_task
 from api.models import *
-from src.helper import *
+from api.src.helper import *
 from django.core.mail import send_mail
 
 @shared_task
