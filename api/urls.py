@@ -12,7 +12,7 @@ urlpatterns = [
     path('users/payment_method/<str:email>/', UserPaymentMethodView.as_view(), name='get-payment-method'),
     
     path('clusters/', getAllCluster, name='cluster-list'),
-    path('clustersgpu/', getAllGPUCluster, name='cluster-gpu-list'),
+    path('clusters/gpu', getAllGPUCluster, name='cluster-gpu-list'),
     path('clusters/cluster_name/<str:cluster_id>/', getClusterByName, name='cluster-detail'),
     path('clusters/my_clusters/', getClusterByUser, name='my-cluster'),
     path('clusters/set_price/', setPrice, name='set-price'),
