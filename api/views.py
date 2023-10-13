@@ -658,7 +658,7 @@ def add_or_update_wallet(request):
 @api_view(['GET'])
 def check_payment_auth(request):
     user = request.user
-
+    print(user.email)
     # Check if user is in StripeCustomer table
     try:
         stripe_customer = StripeCustomer.objects.get(user=user)
