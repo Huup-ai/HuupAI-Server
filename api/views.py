@@ -657,6 +657,8 @@ def add_or_update_wallet(request):
 ###################################   STRIPE API    #####################################
 @api_view(['GET'])
 def check_payment_auth(request):
+    if settings.TEST_MODE:
+        return Response({"message": "Payment method is valid"}, status=status.HTTP_200_OK)
     user = request.user
 
     # Check if user is in StripeCustomer table
