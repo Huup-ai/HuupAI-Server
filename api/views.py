@@ -657,8 +657,6 @@ def add_or_update_wallet(request):
 ###################################   STRIPE API    #####################################
 @api_view(['GET'])
 def check_payment_auth(request):
-    if settings.TEST_MODE:
-        return Response({"message": "Payment method is valid"}, status=status.HTTP_200_OK)
     user = request.user
 
     # Check if user is in StripeCustomer table
@@ -673,6 +671,8 @@ def check_payment_auth(request):
     if not payment_method_id:
         return Response({"error": "No payment method found for user"}, status=status.HTTP_400_BAD_REQUEST)
 
+    if settings.TEST_MODE:
+        return Response({"message": "Payment method is valid"}, status=status.HTTP_200_OK)
     # Now, create a SetupIntent using Stripe API to check if payment can be authorized
     stripe.api_key = STRIPE_API
 
