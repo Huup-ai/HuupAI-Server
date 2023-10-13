@@ -48,7 +48,6 @@ def start_instance(user, spec, cluster_id):
     defaults = {
         'status': "started",
         'start_time': timezone.now(),
-        'cluster': cluster_id,
         'usage': 0.0,
         'price': price,
         }
