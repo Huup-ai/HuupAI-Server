@@ -328,7 +328,7 @@ def VMCreate(request, cluster_id):
     payload = {'metadata': metadata, 'spec': spec, 'status': status_info}
     # Create an instance in the database
     try:
-        instance = start_instance(request.user, metadata, cluster.id)
+        instance = start_instance(request.user, metadata, cluster)
     except Exception as e:
         return Response({"error": f"Cannot create the instance in the database: {e}"}, status=status.HTTP_400_BAD_REQUEST)
     try:
