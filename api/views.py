@@ -699,6 +699,8 @@ def check_payment_auth(request):
 def set_stripe_data(request):
     user = request.user
     stripe_payment = request.data.get('stripe_payment')
+    if not stripe_payment:
+        return Response({'error': 'payment token is required'}, status=500)
     stripe.api_key = STRIPE_API
 
     try:
@@ -717,7 +719,7 @@ def set_stripe_data(request):
             stripe_customer_id=customer['id'],
             stripe_payment=stripe_payment
         )
-
+    print(stripe_payment)
     # Check whether the payment method needs to be updated
     if stripe_customer.stripe_payment != stripe_payment and stripe_payment:
         # Attach the new payment method to the customer in Stripe
