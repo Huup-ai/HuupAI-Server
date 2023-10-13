@@ -663,12 +663,14 @@ def check_payment_auth(request):
     try:
         stripe_customer = StripeCustomer.objects.get(user=user)
     except StripeCustomer.DoesNotExist:
+        print('User is not associated with a Stripe Customer')
         return Response({"error": "User is not associated with a Stripe Customer"}, status=status.HTTP_404_NOT_FOUND)
 
     # Assuming the payment method is stored in stripe_payment
     payment_method_id = stripe_customer.stripe_payment
 
     if not payment_method_id:
+        print('No payment method found for user')
         return Response({"error": "No payment method found for user"}, status=status.HTTP_400_BAD_REQUEST)
 
     if settings.TEST_MODE:
@@ -685,9 +687,11 @@ def check_payment_auth(request):
         if setup_intent.status == "succeeded":
             return Response({"message": "Payment method is valid"}, status=status.HTTP_200_OK)
         else:
+            print('Payment method validation failed')
             return Response({"error": "Payment method validation failed"}, status=status.HTTP_400_BAD_REQUEST)
 
     except stripe.error.StripeError as e:
+        print('stripe error')
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
 @api_view(['POST'])
