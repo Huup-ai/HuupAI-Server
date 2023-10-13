@@ -536,32 +536,22 @@ class UserPaymentMethodView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        email = request.query_params.get('email')
-        if not email:
-            return Response({"error": "Email is required"}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            user = User.objects.get(email=email)
-            return Response({"email": user.email, "payment_method": user.payment_method}, status=status.HTTP_200_OK)
-        except ObjectDoesNotExist:
-            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        user = request.user  # Use the user from the request
+        return Response({"email": user.email, "payment_method": user.payment_method}, status=status.HTTP_200_OK)
     
     def post(self, request):
-        email = request.query_params.get('email')
+        user = request.user  # Use the user from the request
         payment_method = request.data.get('payment_method')
+        
         if not payment_method:
             return Response({"error": "Payment method is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            user = User.objects.get(email=email)
-            user.payment_method = payment_method
-            user.save()
+        user.payment_method = payment_method
+        user.save()
 
-            return Response({
-                "message": "Payment method updated successfully"
-            }, status=status.HTTP_200_OK)
-        except ObjectDoesNotExist:
-            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({
+            "message": "Payment method updated successfully"
+        }, status=status.HTTP_200_OK)
 ###################################   INVENTORY API    #####################################
 @api_view(['GET'])
 def getSshKey(request, cluster_id):
