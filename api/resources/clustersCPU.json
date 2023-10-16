@@ -2,61 +2,49 @@
     {
         "id": "c-m-889dmgrg",
         "region": "suzhou",
-        "cpu": "144",
-        "memory": "196513740Ki",
-        "pods": "510",
-        "price": 1,
-        "is_audited":"audited",
-        "virtualization": true
+        "configuration":"6 Core Intel i7-12700k CPU, 128GB DDR4 Ram, 100G Bandwith, 10TB SSD",
+        "price": 0.0039,
+        "is_audited":"nonaudited",
+        "virtualization": false
     },
     {
-        "id": "c-m-96b6k68z",
+        "id": "c-m-ejdi9wee",
         "region": "suzhou",
-        "cpu": "144",
-        "memory": "295437692Ki",
-        "pods": "990",
-        "price": 1,
+        "configuration":"6 Core Intel i9-13900ks CPU, 256GB DDR5 Ram, 500G Bandwith, 50TB SSD",
+        "price": 0.0079,
         "is_audited":"nonaudited",
         "virtualization": false
     },
     {
-        "id": "c-m-ffrv4wlj",
+        "id": "c-m-856zysgm",
         "region": "suzhou",
-        "cpu": "0",
-        "memory": "0",
-        "pods": "0",
-        "price": 1,
+        "configuration":"6 Core Intel i9-13900ks CPU, 256GB DDR5 Ram, 500G Bandwith, 50TB SSD",
+        "price": 0.0042,
         "is_audited":"nonaudited",
         "virtualization": false
     },
     {
-        "id": "c-m-h54g2pwh",
-        "region": "jinan",
-        "cpu": "6",
-        "memory": "12091160Ki",
-        "pods": "110",
-        "price": 1,
-        "is_audited":"nonaudited",
-        "virtualization": false
-    },
-    {
-        "id": "c-m-xfvj57wh",
+        "id": "c-m-grty0102",
         "region": "suzhou",
-        "cpu": "0",
-        "memory": "0",
-        "pods": "0",
-        "price": 1,
-        "is_audited":"audited",
+        "configuration":"6 Core Intel i7-12700k CPU, 128GB DDR4 Ram, 100G Bandwith, 10TB SSD",
+        "price": 0.0039,
+        "is_audited":"nonaudited",
         "virtualization": false
     },
     {
-        "id": "local",
-        "region": null,
-        "cpu": "8",
-        "memory": "16321752Ki",
-        "pods": "110",
-        "price": 1,
+        "id": "c-m-998fhyfl",
+        "region": "suzhou",
+        "configuration":"6 Core Intel i7-12700k CPU, 128GB DDR4 Ram, 100G Bandwith, 10TB SSD",
+        "price": 0.0039,
         "is_audited":"nonaudited",
-        "virtualization": true
+        "virtualization": false
+    },
+    {
+        "id": "c-m-160imglk",
+        "region": "suzhou",
+        "configuration":"6 Core Intel i7-12700k CPU, 128GB DDR4 Ram, 100G Bandwith, 10TB SSD",
+        "price": 0.0039,
+        "is_audited":"nonaudited",
+        "virtualization": false
     }
 ]
