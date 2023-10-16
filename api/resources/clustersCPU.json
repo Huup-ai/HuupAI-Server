@@ -6,6 +6,7 @@
         "memory": "196513740Ki",
         "pods": "510",
         "price": 1,
+        "is_audited":"audited",
         "virtualization": true
     },
     {
@@ -15,6 +16,7 @@
         "memory": "295437692Ki",
         "pods": "990",
         "price": 1,
+        "is_audited":"nonaudited",
         "virtualization": false
     },
     {
@@ -24,6 +26,7 @@
         "memory": "0",
         "pods": "0",
         "price": 1,
+        "is_audited":"nonaudited",
         "virtualization": false
     },
     {
@@ -33,6 +36,7 @@
         "memory": "12091160Ki",
         "pods": "110",
         "price": 1,
+        "is_audited":"nonaudited",
         "virtualization": false
     },
     {
@@ -42,6 +46,7 @@
         "memory": "0",
         "pods": "0",
         "price": 1,
+        "is_audited":"audited",
         "virtualization": false
     },
     {
@@ -51,6 +56,7 @@
         "memory": "16321752Ki",
         "pods": "110",
         "price": 1,
+        "is_audited":"nonaudited",
         "virtualization": true
     }
 ]
