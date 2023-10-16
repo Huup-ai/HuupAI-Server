@@ -9,8 +9,8 @@ def get_external_api_token(user):
     try:
         url = "https://edgesphereszsciit.com/v3-public/localProviders/local?action=login"
         payload = {
-            "username": user.email, # Assuming username is the email of the user
-            "password": user.password, # You should store passwords securely (hashed) and not in plain text
+            "username": user.email,
+            "password": user.password,
         }
         # send the POST request
         response = requests.post(url, json=payload)

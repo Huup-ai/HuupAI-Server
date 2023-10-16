@@ -593,14 +593,24 @@ def pay_invoice(request, invoice_id):
             return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
         # Get the invoice to be paid
         invoice = Invoice.objects.get(invoice_id=invoice_id, user_id=request.user)
-        
-        # Mark the invoice as paid
-        invoice.paid = True
-        invoice.save()
-        
-        # # Reset the invoice table
-        # with transaction.atomic():
-        #     Invoice.objects.filter(paid=True).delete()
+        stripe_customer = StripeCustomer.objects.get(user=request.user)
+        try:
+            payment_intent = stripe.PaymentIntent.create(
+                amount=int(invoice.total_price * 100),  # Amount in cents
+                currency='usd',  # Set to your preferred currency
+                customer=stripe_customer.stripe_customer_id,
+                payment_method=stripe_customer.stripe_payment
+            )
+            
+            # Check payment status and update invoices
+            if payment_intent.status == "succeeded":
+                invoice.paid = True
+                invoice.save()
+        except StripeCustomer.DoesNotExist:
+            print(f"User ID {request.user.id} does not have an associated Stripe Customer.")
+        except stripe.error.StripeError as e:
+            print(f"Stripe error for User ID {request.user.id}: {e}")
+
 
         return Response({'message': 'Invoice paid and table reset successfully'}, status=status.HTTP_200_OK)
     except Invoice.DoesNotExist:
