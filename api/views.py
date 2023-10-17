@@ -712,7 +712,8 @@ def set_stripe_data(request):
     if not stripe_payment:
         return Response({'error': 'payment token is required'}, status=500)
     stripe.api_key = STRIPE_API
-
+    user.payment_method = 'credit_card'
+    user.save()
     try:
         stripe_customer = StripeCustomer.objects.get(user=request.user)
     except StripeCustomer.DoesNotExist:
