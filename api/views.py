@@ -733,15 +733,18 @@ def set_stripe_data(request):
     # Check whether the payment method needs to be updated
     if stripe_customer.stripe_payment != stripe_payment and stripe_payment:
         # Attach the new payment method to the customer in Stripe
-        stripe.PaymentMethod.attach(
-            stripe_payment,
-            customer=stripe_customer.stripe_customer_id
-        )
-        # Update the default payment method in Stripe
-        stripe.Customer.modify(
-            stripe_customer.stripe_customer_id,
-            invoice_settings={'default_payment_method': stripe_payment},
-        )
+        try:
+            stripe.PaymentMethod.attach(
+                stripe_payment,
+                customer=stripe_customer.stripe_customer_id
+            )
+            # Update the default payment method in Stripe
+            stripe.Customer.modify(
+                stripe_customer.stripe_customer_id,
+                invoice_settings={'default_payment_method': stripe_payment},
+            )
+        except:
+            return Response({'error':'Unable to update payment method, use test card and try again'}, status=400)
         # Update the payment method in the local DB
         stripe_customer.stripe_payment = stripe_payment
         stripe_customer.save()
