@@ -1,0 +1,209 @@
+nohup: ignoring input
+Starting server in TEST_MODE...
+Starting server in TEST_MODE...
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+October 17, 2023 - 03:09:39
+Django version 4.2.4, using settings 'dummy_api.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+
+[17/Oct/2023 03:09:45] "GET /admin/api/instance/ HTTP/1.1" 200 10098
+Not Found: /static/admin/css/dark_mode.css
+[17/Oct/2023 03:09:46] "GET /static/admin/css/dark_mode.css HTTP/1.1" 404 7345
+Not Found: /static/admin/css/base.css
+[17/Oct/2023 03:09:46] "GET /static/admin/css/base.css HTTP/1.1" 404 7330
+Not Found: /static/admin/css/nav_sidebar.css
+[17/Oct/2023 03:09:46] "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 404 7351
+Not Found: /static/admin/css/changelists.css
+[17/Oct/2023 03:09:46] "GET /static/admin/css/changelists.css HTTP/1.1" 404 7351
+Not Found: /static/admin/css/responsive.css
+[17/Oct/2023 03:09:46] "GET /static/admin/css/responsive.css HTTP/1.1" 404 7348
+[17/Oct/2023 03:09:46] "GET /admin/jsi18n/ HTTP/1.1" 200 3343
+Not Found: /static/admin/js/vendor/jquery/jquery.js
+[17/Oct/2023 03:09:46] "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 404 7372
+Not Found: /static/admin/js/jquery.init.js
+[17/Oct/2023 03:09:46] "GET /static/admin/js/jquery.init.js HTTP/1.1" 404 7345
+Not Found: /static/admin/js/core.js
+[17/Oct/2023 03:09:46] "GET /static/admin/js/core.js HTTP/1.1" 404 7324
+Not Found: /static/admin/js/admin/RelatedObjectLookups.js
+[17/Oct/2023 03:09:46] "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 404 7390
+[17/Oct/2023 03:09:46,707] - Broken pipe from ('67.168.144.18', 63514)
+[17/Oct/2023 03:09:46,708] - Broken pipe from ('67.168.144.18', 63515)
+Not Found: /static/admin/js/actions.js
+[17/Oct/2023 03:09:46] "GET /static/admin/js/actions.js HTTP/1.1" 404 7333
+Not Found: /static/admin/js/urlify.js
+[17/Oct/2023 03:09:46] "GET /static/admin/js/urlify.js HTTP/1.1" 404 7330
+[17/Oct/2023 03:09:46,743] - Broken pipe from ('67.168.144.18', 63516)
+Not Found: /static/admin/js/prepopulate.js
+[17/Oct/2023 03:09:46] "GET /static/admin/js/prepopulate.js HTTP/1.1" 404 7345
+Not Found: /static/admin/js/vendor/xregexp/xregexp.js
+[17/Oct/2023 03:09:46] "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 404 7378
+Not Found: /static/admin/css/responsive.css
+[17/Oct/2023 03:09:46] "GET /static/admin/css/responsive.css HTTP/1.1" 404 7348
+Not Found: /static/admin/js/theme.js
+[17/Oct/2023 03:09:47] "GET /static/admin/js/theme.js HTTP/1.1" 404 7327
+Not Found: /static/admin/js/nav_sidebar.js
+[17/Oct/2023 03:09:47] "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 404 7345
+Not Found: /static/admin/js/filters.js
+[17/Oct/2023 03:09:47] "GET /static/admin/js/filters.js HTTP/1.1" 404 7333
+[17/Oct/2023 03:09:47,121] - Broken pipe from ('67.168.144.18', 63523)
+[17/Oct/2023 03:09:52] "GET /admin/api/instance/ HTTP/1.1" 200 10098
+Not Found: /static/admin/css/base.css
+[17/Oct/2023 03:09:52] "GET /static/admin/css/base.css HTTP/1.1" 404 7330
+Not Found: /static/admin/css/dark_mode.css
+[17/Oct/2023 03:09:52] "GET /static/admin/css/dark_mode.css HTTP/1.1" 404 7345
+Not Found: /static/admin/css/nav_sidebar.css
+[17/Oct/2023 03:09:52] "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 404 7351
+Not Found: /static/admin/css/changelists.css
+[17/Oct/2023 03:09:52] "GET /static/admin/css/changelists.css HTTP/1.1" 404 7351
+Not Found: /static/admin/css/responsive.css
+[17/Oct/2023 03:09:52] "GET /admin/jsi18n/ HTTP/1.1" 200 3343
+[17/Oct/2023 03:09:52] "GET /static/admin/css/responsive.css HTTP/1.1" 404 7348
+Not Found: /static/admin/js/vendor/jquery/jquery.js
+[17/Oct/2023 03:09:52] "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 404 7372
+Not Found: /static/admin/js/jquery.init.js
+[17/Oct/2023 03:09:52] "GET /static/admin/js/jquery.init.js HTTP/1.1" 404 7345
+Not Found: /static/admin/js/core.js
+[17/Oct/2023 03:09:52] "GET /static/admin/js/core.js HTTP/1.1" 404 7324
+Not Found: /static/admin/js/admin/RelatedObjectLookups.js
+[17/Oct/2023 03:09:52] "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 404 7390
+Not Found: /static/admin/js/actions.js
+[17/Oct/2023 03:09:52] "GET /static/admin/js/actions.js HTTP/1.1" 404 7333
+Not Found: /static/admin/js/urlify.js
+[17/Oct/2023 03:09:52] "GET /static/admin/js/urlify.js HTTP/1.1" 404 7330
+Not Found: /static/admin/js/prepopulate.js
+[17/Oct/2023 03:09:53] "GET /static/admin/js/prepopulate.js HTTP/1.1" 404 7345
+Not Found: /static/admin/js/vendor/xregexp/xregexp.js
+[17/Oct/2023 03:09:53] "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 404 7378
+Not Found: /static/admin/js/theme.js
+[17/Oct/2023 03:09:53] "GET /static/admin/js/theme.js HTTP/1.1" 404 7327
+Not Found: /static/admin/js/filters.js
+[17/Oct/2023 03:09:53] "GET /static/admin/js/filters.js HTTP/1.1" 404 7333
+Not Found: /static/admin/css/responsive.css
+Not Found: /static/admin/js/nav_sidebar.js
+[17/Oct/2023 03:09:53] "GET /static/admin/css/responsive.css HTTP/1.1" 404 7348
+[17/Oct/2023 03:09:53] "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 404 7345
+nohup: ignoring input
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+October 17, 2023 - 03:11:20
+Django version 4.2.4, using settings 'dummy_api.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+
+[17/Oct/2023 03:11:28] "GET /admin/ HTTP/1.1" 200 11058
+Not Found: /static/admin/css/base.css
+[17/Oct/2023 03:11:28] "GET /static/admin/css/base.css HTTP/1.1" 404 7330
+Not Found: /static/admin/css/dark_mode.css
+[17/Oct/2023 03:11:28] "GET /static/admin/css/dark_mode.css HTTP/1.1" 404 7345
+Not Found: /static/admin/css/nav_sidebar.css
+[17/Oct/2023 03:11:28] "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 404 7351
+Not Found: /static/admin/css/dashboard.css
+[17/Oct/2023 03:11:28] "GET /static/admin/css/dashboard.css HTTP/1.1" 404 7345
+Not Found: /static/admin/css/responsive.css
+[17/Oct/2023 03:11:28] "GET /static/admin/css/responsive.css HTTP/1.1" 404 7348
+Not Found: /static/admin/js/theme.js
+[17/Oct/2023 03:11:28] "GET /static/admin/js/theme.js HTTP/1.1" 404 7327
+[17/Oct/2023 03:11:28,390] - Broken pipe from ('67.168.144.18', 63556)
+Not Found: /static/admin/js/nav_sidebar.js
+[17/Oct/2023 03:11:28] "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 404 7345
+nohup: ignoring input
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+October 17, 2023 - 03:13:30
+Django version 4.2.4, using settings 'dummy_api.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+
+nohup: ignoring input
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+Error: That port is already in use.
+[17/Oct/2023 03:13:53] "GET /admin/api/stripecustomer/ HTTP/1.1" 200 11303
+[17/Oct/2023 03:13:53] "GET /admin/jsi18n/ HTTP/1.1" 200 3343
+[17/Oct/2023 03:13:54] "GET /admin/api/stripecustomer/ HTTP/1.1" 200 11303
+[17/Oct/2023 03:13:54] "GET /admin/jsi18n/ HTTP/1.1" 200 3343
+nohup: ignoring input
+[17/Oct/2023 03:14:07] "OPTIONS /users/login/ HTTP/1.1" 200 0
+Starting server in TEST_MODE...
+Starting server in TEST_MODE...
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+October 17, 2023 - 03:14:08
+Django version 4.2.4, using settings 'dummy_api.settings'
+Starting development server at http://0.0.0.0:9000/
+Quit the server with CONTROL-C.
+
+[17/Oct/2023 03:14:08] "POST /users/login/ HTTP/1.1" 200 486
+[17/Oct/2023 03:14:08] "OPTIONS /wallets/get_wallets/ HTTP/1.1" 200 0
+[17/Oct/2023 03:14:09] "GET /wallets/get_wallets/ HTTP/1.1" 200 96
+[17/Oct/2023 03:14:09] "OPTIONS /instances/get_instances/ HTTP/1.1" 200 0
+[17/Oct/2023 03:14:09] "GET /instances/get_instances/ HTTP/1.1" 200 2
+[17/Oct/2023 03:14:13] "GET /admin/api/stripecustomer/ HTTP/1.1" 200 11303
+Not Found: /static/admin/css/base.css
+[17/Oct/2023 03:14:13] "GET /static/admin/css/base.css HTTP/1.1" 404 7330
+Not Found: /static/admin/css/dark_mode.css
+[17/Oct/2023 03:14:14] "GET /static/admin/css/dark_mode.css HTTP/1.1" 404 7345
+[17/Oct/2023 03:14:14,066] - Broken pipe from ('67.168.144.18', 63574)
+Not Found: /static/admin/css/nav_sidebar.css
+[17/Oct/2023 03:14:14] "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 404 7351
+Not Found: /static/admin/css/changelists.css
+[17/Oct/2023 03:14:14] "GET /static/admin/css/changelists.css HTTP/1.1" 404 7351
+[17/Oct/2023 03:14:14] "GET /admin/jsi18n/ HTTP/1.1" 200 3343
+Not Found: /static/admin/css/responsive.css
+[17/Oct/2023 03:14:14] "GET /static/admin/css/responsive.css HTTP/1.1" 404 7348
+Not Found: /static/admin/js/vendor/jquery/jquery.js
+[17/Oct/2023 03:14:14] "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 404 7372
+Not Found: /static/admin/js/jquery.init.js
+[17/Oct/2023 03:14:14] "GET /static/admin/js/jquery.init.js HTTP/1.1" 404 7345
+Not Found: /static/admin/js/core.js
+[17/Oct/2023 03:14:14] "GET /static/admin/js/core.js HTTP/1.1" 404 7324
+Not Found: /static/admin/js/admin/RelatedObjectLookups.js
+[17/Oct/2023 03:14:14] "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 404 7390
+Not Found: /static/admin/js/actions.js
+[17/Oct/2023 03:14:14] "GET /static/admin/js/actions.js HTTP/1.1" 404 7333
+Not Found: /static/admin/js/urlify.js
+[17/Oct/2023 03:14:14] "GET /static/admin/js/urlify.js HTTP/1.1" 404 7330
+Not Found: /static/admin/js/prepopulate.js
+[17/Oct/2023 03:14:14] "GET /static/admin/js/prepopulate.js HTTP/1.1" 404 7345
+Not Found: /static/admin/js/vendor/xregexp/xregexp.js
+[17/Oct/2023 03:14:14] "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 404 7378
+Not Found: /static/admin/js/theme.js
+[17/Oct/2023 03:14:14] "GET /static/admin/js/theme.js HTTP/1.1" 404 7327
+Not Found: /static/admin/css/responsive.css
+[17/Oct/2023 03:14:14] "GET /static/admin/css/responsive.css HTTP/1.1" 404 7348
+Not Found: /static/admin/js/nav_sidebar.js
+[17/Oct/2023 03:14:14] "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 404 7345
+Not Found: /static/admin/js/filters.js
+[17/Oct/2023 03:14:14] "GET /static/admin/js/filters.js HTTP/1.1" 404 7333
+[17/Oct/2023 03:14:15] "OPTIONS /instances/get_instances/ HTTP/1.1" 200 0
+[17/Oct/2023 03:14:15] "GET /instances/get_instances/ HTTP/1.1" 200 2
+[17/Oct/2023 03:14:16] "OPTIONS /instances/get_instances/ HTTP/1.1" 200 0
+[17/Oct/2023 03:14:17] "GET /instances/get_instances/ HTTP/1.1" 200 2
+[17/Oct/2023 03:14:17] "OPTIONS /instances/get_instances/ HTTP/1.1" 200 0
+[17/Oct/2023 03:14:17] "GET /instances/get_instances/ HTTP/1.1" 200 2
+[17/Oct/2023 03:14:18] "OPTIONS /instances/get_instances/ HTTP/1.1" 200 0
+[17/Oct/2023 03:14:18] "GET /instances/get_instances/ HTTP/1.1" 200 2
+[17/Oct/2023 03:14:37] "OPTIONS /provider/login/ HTTP/1.1" 200 0
+[17/Oct/2023 03:14:37] "POST /provider/login/ HTTP/1.1" 200 545
+[17/Oct/2023 03:14:38] "OPTIONS /wallets/get_wallets/ HTTP/1.1" 200 0
+[17/Oct/2023 03:14:38] "GET /wallets/get_wallets/ HTTP/1.1" 200 95
+[17/Oct/2023 03:14:38] "OPTIONS /instances/get_instances/ HTTP/1.1" 200 0
+[17/Oct/2023 03:14:38] "GET /instances/get_instances/ HTTP/1.1" 200 2
+[17/Oct/2023 03:14:41] "OPTIONS /invoices/get_user_invoices/ HTTP/1.1" 200 0
+[17/Oct/2023 03:14:41] "OPTIONS /users/payment_method/ HTTP/1.1" 200 0
+[17/Oct/2023 03:14:41] "GET /invoices/get_user_invoices/ HTTP/1.1" 200 2
+[17/Oct/2023 03:14:41] "GET /users/payment_method/ HTTP/1.1" 200 38
+[17/Oct/2023 03:14:41] "OPTIONS /users/info/ HTTP/1.1" 200 0
+[17/Oct/2023 03:14:42] "GET /users/info/ HTTP/1.1" 200 600
