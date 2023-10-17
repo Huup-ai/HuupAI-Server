@@ -10,7 +10,7 @@ class Pricing(models.Model):
     
     def __str__(self):
         return f"Pricing {self.pricing_id}"
-                                   
+                                 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
@@ -108,3 +108,8 @@ class Wallet(models.Model):
 
     def __str__(self):
         return f"{self.user}'s wallet"
+
+class APIKey(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    key = models.CharField(max_length=256, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)

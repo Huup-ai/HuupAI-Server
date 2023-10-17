@@ -15,6 +15,7 @@ STRIPE_API = 'sk_test_51NT86tLM79TglgywZ5DMu5q9nOyWvxzDLbdqLOeAClOAYRa823nz347d4
 import requests
 import json
 import stripe
+import uuid
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
@@ -27,6 +28,8 @@ from rest_framework.decorators import api_view, permission_classes
 
 from django.contrib.auth import login, logout, authenticate
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import BaseAuthentication
+from rest_framework.exceptions import AuthenticationFailed
 from django.db import transaction
 from django.conf import settings
 
@@ -422,7 +425,6 @@ def VMTerminate(request, cluster_id, vm_name, vm_namespace):
         return Response({"error": "Instance not found for this user."}, status=404)
     except requests.RequestException:  # More specific than a general exception
         return Response({"error": "Failed to terminate VM in the cloud."}, status=status.HTTP_404_NOT_FOUND)
-
 
 ###################################   USER API    #####################################
 class UserRegistrationAPI(APIView):
