@@ -36,7 +36,4 @@ urlpatterns = [
 
     path('wallets/get_wallets/', get_wallets, name='get-wallets'),
     path('wallet/add/', add_or_update_wallet, name='add-or-update-wallet'),
-
-    path('start_cvm/', start_cvm, name='start_cvm'),
-    path('stop_cvm/', stop_cvm, name='stop_cvm'),
     ]

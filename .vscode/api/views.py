@@ -34,10 +34,6 @@ from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from tencentcloud.common import credential
-from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentCloudSDKException
-from tencentcloud.cvm.v20170312 import cvm_client, models
-
 from pathlib import Path
 
 ###################################   Cluster API   #####################################
@@ -733,42 +729,3 @@ def set_stripe_data(request):
         user.save()
 
     return JsonResponse({'status': 'success'}, status=200)
-
-@api_view(['GET'])
-def start_cvm(request):
-    # 配置腾讯云认证信息
-    cred = credential.Credential("YourSecretId", "YourSecretKey")
-
-    try:
-        # 创建 Cvm 实例
-        client = cvm_client.CvmClient(cred, "ap-guangzhou")
-        req = models.RunInstancesRequest()
-        params = {
-            # ...  # 这里填写你的 Cvm 创建参数，参考之前的例子
-        }
-        req.from_json_string(json.dumps(params))
-        resp = client.RunInstances(req)
-
-        return JsonResponse({"message": "Cvm 创建成功！"})
-    except TencentCloudSDKException as err:
-        return JsonResponse({"error": str(err)})
-
-@api_view(['POST'])
-def stop_cvm(request):
-    # 配置腾讯云认证信息
-    cred = credential.Credential("YourSecretId", "YourSecretKey")
-
-    try:
-        # 关闭 Cvm 实例
-        client = cvm_client.CvmClient(cred, "ap-guangzhou")
-        req = models.StopInstancesRequest()
-        params = {
-            "InstanceIds": ["YourInstanceId"],  # 你的 Cvm 实例 ID
-            "ForceStop": True  # 是否强制关闭
-        }
-        req.from_json_string(json.dumps(params))
-        resp = client.StopInstances(req)
-
-        return JsonResponse({"message": "Cvm 关闭成功！"})
-    except TencentCloudSDKException as err:
-        return JsonResponse({"error": str(err)})
