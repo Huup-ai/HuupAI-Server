@@ -286,7 +286,11 @@ def VMGet(request, cluster_id, vm_name, vm_namespace):
         vm_name=vm_name,
         vm_namespace=vm_namespace
     ).first()
-    
+
+    time_delta = timezone.now() - instance.start_time
+    instance.usage += round(time_delta.total_seconds() / 3600,2)
+    instance.start_time = timezone.now()
+    instance.save()
     if not instance:
         return Response({"error": "Instance not found."}, status=status.HTTP_404_NOT_FOUND)
 
