@@ -260,6 +260,8 @@ def getAllUsage(request):
                 'item_id': i.cluster.item_id,
                 'region': i.cluster.region,
                 'cpu': i.cluster.cpu,
+                'gpu': i.cluster.gpu,
+                'config': i.cluster.configurations,
                 'memory': i.cluster.memory,
                 'pods': i.cluster.pods,
                 'price': i.cluster.price,
