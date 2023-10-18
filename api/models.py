@@ -85,7 +85,7 @@ class Instance(models.Model):
     stop_time = models.DateTimeField(blank=True, null=True)
     usage = models.FloatField(blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    dns = models.CharField(max_length=255, unique=False, default='huupai@vm-unknown.com')
+    dns = models.CharField(max_length=255, default='huupai@vm-unknown.com')
     def __str__(self):
         return f"Instance {self.vm_name} created by {self.user_id}"
 
