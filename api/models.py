@@ -66,6 +66,8 @@ class Cluster(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     provider = models.ForeignKey(User, on_delete=models.CASCADE,null=True)
     virtualization = models.BooleanField(default=False)
+    gpu = models.CharField(max_length=255, null=True, blank=True)  # GPU field
+    configurations = models.TextField(null=True, blank=True)  # Configurations field
 
     def __str__(self):
         return f"Cluster {self.item_id} - {self.region}"
