@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -47,6 +48,13 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 
+CELERY_BEAT_SCHEDULE = {
+    'my-hourly-task': {
+        'task': 'api.tasks.check_instance_status',
+        'schedule': crontab(minute=0, hour='*'),
+    },
+}
+
 #Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.zoho.com'
@@ -73,6 +81,7 @@ INSTALLED_APPS = [
     'api',
     'corsheaders',
     'drf_yasg',
+    'django_celery_beat',
 ]
 AUTH_USER_MODEL = 'api.User'
 
