@@ -49,9 +49,13 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 
 CELERY_BEAT_SCHEDULE = {
-    'check_instance_status': {
+    'check-instance-status': {
         'task': 'api.tasks.check_instance_status',
-        'schedule': timedelta(minutes=1),
+        'schedule': crontab(minute=0, hour='*'),  # Hourly
+    },
+    'daily-billing-task': {
+        'task': 'api.tasks.daily_billing_task',
+        'schedule': crontab(minute=0, hour=0),  # Daily at midnight
     },
 }
 
