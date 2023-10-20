@@ -9,6 +9,7 @@ urlpatterns = [
     path('users/register/', UserRegistrationAPI.as_view(), name='user-register'),
     path('provider/login/', ProviderLoginOrRegisterView.as_view(), name='provider-login'),
     path('users/info/', UserUpdateRetrieveView.as_view(), name='user-info'),
+    path('users/change_password/', ChangePasswordView.as_view(), name='change-password'),
     path('users/payment_method/', UserPaymentMethodView.as_view(), name='get-payment-method'),
     
     path('clusters/', getAllCluster, name='cluster-list'),

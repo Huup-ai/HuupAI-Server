@@ -43,8 +43,6 @@ from pathlib import Path
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def getAllCluster(request):
-        CUR_DIR = Path(__file__).parent.absolute()
-        CLUSTER_PATH = CUR_DIR /'resources/clustersCPU.json'
         if not settings.TEST_MODE:
             res = requests.get('https://edgesphere.szsciit.com/v1/management.cattle.io.clusters',cookies=COOKIES,headers={}, verify=CERT)
             if 200 <= res.status_code <= 299:
@@ -95,9 +93,26 @@ def getAllCluster(request):
                 result_list.append(result_dict)
             return JsonResponse(result_list, safe=False)
         else:
+            CUR_DIR = Path(__file__).parent.absolute()
+            CLUSTER_PATH = CUR_DIR /'resources/clustersCPU.json'
+            # Read data from clustersCPU.json file
             with open(CLUSTER_PATH, 'r') as file:
-                result_list = json.load(file)
-            return JsonResponse(result_list, safe=False)
+                clusters_data = json.load(file)
+
+            for data in clusters_data:
+                Cluster.objects.update_or_create(
+                    item_id=data['item_id'],
+                    defaults={
+                        'region': data['region'],
+                        'configurations': data['configuration'],
+                        'price': data['price'],
+                        'virtualization': data['virtualization'],
+                        'is_audited':False
+                    }
+                )
+            clusters = Cluster.objects.all()
+            serializer = ClusterSerializer(clusters, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -196,7 +211,18 @@ def setPrice(request):
     )
     
     serializer = PricingSerializer(pricing)
-    return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+
+    try:
+        cluster = Cluster.objects.get(item_id=cluster_id)
+        if cluster.provider != user:
+            return Response({'error': 'User is not the provider of this cluster'}, status=status.HTTP_403_FORBIDDEN)
+        cluster.price = price
+        cluster.save()
+        
+        serializer = ClusterSerializer(cluster)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Cluster.DoesNotExist:
+        return Response({'error': 'Cluster not found'}, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['GET'])
 def getClusterByUser(request):
@@ -211,7 +237,7 @@ def getClusterByUser(request):
 
     return Response(serializer.data, status=status.HTTP_200_OK)
 
-    
+
 ###################################   VM API    #####################################
 @api_view(['GET'])
 def getInstances(request):
@@ -538,6 +564,21 @@ class UserUpdateRetrieveView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ChangePasswordView(APIView):
+
+    def post(self, request, *args, **kwargs):
+        serializer = ChangePasswordSerializer(data=request.data)
+        if serializer.is_valid():
+            user = request.user
+            old_password = serializer.validated_data['old_password']
+            new_password = serializer.validated_data['new_password']
+            if not user.check_password(old_password):
+                return Response({'old_password': 'Wrong password.'}, status=status.HTTP_400_BAD_REQUEST)
+            user.set_password(new_password)
+            user.save()
+            return Response({'status': 'password set'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class UserPaymentMethodView(APIView):

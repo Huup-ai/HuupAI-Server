@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import *
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.contrib.auth.password_validation import validate_password
 
 User = get_user_model()
 class InstanceSerializer(serializers.ModelSerializer):
@@ -36,6 +37,14 @@ class UserSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ('email', 'reg_date', 'role', 'invoice_date' , 'is_provider')
 
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
+    def validate_new_password(self, value):
+        validate_password(value)
+        return value
+
 class PricingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pricing
@@ -67,4 +76,5 @@ class WalletSerializer(serializers.ModelSerializer):
 class ClusterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cluster
-        fields = ['item_id', 'region', 'cpu', 'memory', 'pods', 'price', 'provider','virtualization']
+        fields = ['item_id', 'region', 'cpu', 'memory', 'pods', 'price', 'provider','virtualization',
+        'gpu','configurations']
