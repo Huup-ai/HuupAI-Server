@@ -57,7 +57,8 @@ class VMCreateSerializer(serializers.Serializer):
 
 class VMUpdateSerializer(serializers.Serializer):
     action = serializers.CharField(required=True, max_length=255)
-    vmName = serializers.CharField(required=True, max_length=255)
+    vm_name = serializers.CharField(required=True, max_length=255)
+    vm_namespace = serializers.CharField(required=True, max_length=255)
 
 class InvoiceSerializer(serializers.ModelSerializer):
     class Meta:
