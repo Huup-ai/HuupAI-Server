@@ -101,7 +101,7 @@ def getAllCluster(request):
 
             for data in clusters_data:
                 Cluster.objects.update_or_create(
-                    item_id=data['item_id'],
+                    item_id=data['id'],
                     defaults={
                         'region': data['region'],
                         'configurations': data['configuration'],
@@ -177,7 +177,7 @@ def getAllGPUCluster(request):
 
             for data in clusters_data:
                 Cluster.objects.update_or_create(
-                    item_id=data['item_id'],
+                    item_id=data['id'],
                     defaults={
                         'region': data['region'],
                         'configurations': data['configuration'],
