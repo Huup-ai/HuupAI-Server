@@ -69,7 +69,7 @@ class Cluster(models.Model):
     virtualization = models.BooleanField(default=False)
     is_audited = models.BooleanField(default=False)
     gpu = models.CharField(max_length=255, null=True, blank=True)  # GPU field
-    configurations = models.TextField(null=True, blank=True)  # Configurations field
+    configuration = models.TextField(null=True, blank=True)  # Configurations field
 
     def __str__(self):
         return f"Cluster {self.item_id} - {self.region}"
