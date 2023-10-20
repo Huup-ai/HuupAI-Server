@@ -180,10 +180,10 @@ def getAllGPUCluster(request):
                     item_id=data['id'],
                     defaults={
                         'region': data['region'],
-                        'configurations': data['configuration'],
+                        'configuration': data['configuration'],
                         'price': data['price'],
                         'gpu': data['gpu'],
-                        'is_audited':False
+                        'is_audited':data['is_audited']
                     }
                 )
             clusters = Cluster.objects.all()
