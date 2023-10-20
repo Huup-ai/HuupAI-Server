@@ -5,7 +5,7 @@
         "configuration":"6 Core Intel i7-12700k CPU, 128GB DDR4 Ram, 100G Bandwith, 10TB SSD",
         "gpu": "1* NvidiaV100(80G)",
         "price": 0.39,
-        "is_audited":"nonaudited"
+        "is_audited":"False"
     },
     {
         "id": "c-m-38d6hl29",
@@ -13,7 +13,7 @@
         "configuration":"26 Core Intel i9-13900ks CPU, 128GB DDR4 Ram, 100G Bandwith, 10TB SSD",
         "gpu": "1* NvidiaV100(80G)",
         "price": 0.42,
-        "is_audited":"nonaudited"
+        "is_audited": "False"
     },
     {
         "id": "c-m-39dnj98f",
@@ -21,7 +21,7 @@
         "configuration":"26 Core Intel i7-12700k CPU, 128GB DDR4 Ram, 100G Bandwith, 10TB SSD",
         "gpu": "4*NvidiaA100(80G)",
         "price": 0.95,
-        "is_audited":"audited"
+        "is_audited":"True"
     },
     {
         "id": "c-m-k83bg63",
@@ -29,7 +29,7 @@
         "configuration":"26 Core Intel i7-12700k CPU, 128GB DDR4 Ram, 100G Bandwith, 20TB SSD",
         "gpu": "4*NvidiaA100(80G)",
         "price": 0.5,
-        "is_audited":"audited"
+        "is_audited":"True"
     },
     {
         "id": "c-m-cm98nfg7",
@@ -37,6 +37,6 @@
         "configuration":"26 Core Intel i7-12700k CPU, 128GB DDR4 Ram, 100G Bandwith, 20TB SSD",
         "gpu": "4*NvidiaA100(80G)",
         "price": 0.5,
-        "is_audited":"audited"
+        "is_audited":"True"
     }
 ]

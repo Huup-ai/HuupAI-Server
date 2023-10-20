@@ -4,7 +4,7 @@
         "region": "suzhou",
         "configuration":"6 Core Intel i7-12700k CPU, 128GB DDR4 Ram, 100G Bandwith, 10TB SSD",
         "price": 0.39,
-        "is_audited":"nonaudited",
+        "is_audited":"True",
         "virtualization": false
     },
     {
@@ -12,7 +12,7 @@
         "region": "suzhou",
         "configuration":"6 Core Intel i9-13900ks CPU, 256GB DDR5 Ram, 500G Bandwith, 50TB SSD",
         "price": 0.79,
-        "is_audited":"nonaudited",
+        "is_audited":"True",
         "virtualization": false
     },
     {
@@ -20,7 +20,7 @@
         "region": "suzhou",
         "configuration":"6 Core Intel i9-13900ks CPU, 256GB DDR5 Ram, 500G Bandwith, 50TB SSD",
         "price": 0.2,
-        "is_audited":"nonaudited",
+        "is_audited":"True",
         "virtualization": false
     },
     {
@@ -28,7 +28,7 @@
         "region": "suzhou",
         "configuration":"6 Core Intel i7-12700k CPU, 128GB DDR4 Ram, 100G Bandwith, 10TB SSD",
         "price": 0.39,
-        "is_audited":"nonaudited",
+        "is_audited":"True",
         "virtualization": false
     },
     {
@@ -36,7 +36,7 @@
         "region": "suzhou",
         "configuration":"6 Core Intel i7-12700k CPU, 128GB DDR4 Ram, 100G Bandwith, 10TB SSD",
         "price": 0.39,
-        "is_audited":"nonaudited",
+        "is_audited":"True",
         "virtualization": false
     },
     {
@@ -44,7 +44,7 @@
         "region": "suzhou",
         "configuration":"6 Core Intel i7-12700k CPU, 128GB DDR4 Ram, 100G Bandwith, 10TB SSD",
         "price": 0.39,
-        "is_audited":"nonaudited",
+        "is_audited":"True",
         "virtualization": false
     }
 ]
