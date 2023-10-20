@@ -10,7 +10,7 @@ class InstanceSerializer(serializers.ModelSerializer):
         model = Instance
         fields = [
             'instance_id','cluster', 'vm_name',
-            'status', 'usage', 'price', 'payment_method','dns'
+            'status', 'usage', 'payment_method','dns'
         ]
         depth = 1
 
