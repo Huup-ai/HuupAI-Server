@@ -279,7 +279,6 @@ def getInstances(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
 def getAllUsage(request):
     # Get instances with information relate to cluster
     instances = Instance.objects.select_related('cluster').filter(user_id=request.user)
