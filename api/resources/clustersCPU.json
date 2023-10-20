@@ -5,7 +5,7 @@
         "configuration":"6 Core Intel i7-12700k CPU, 128GB DDR4 Ram, 100G Bandwith, 10TB SSD",
         "price": 0.39,
         "is_audited":"True",
-        "virtualization": false
+        "virtualization": true
     },
     {
         "id": "c-m-ejdi9wee",
@@ -13,7 +13,7 @@
         "configuration":"6 Core Intel i9-13900ks CPU, 256GB DDR5 Ram, 500G Bandwith, 50TB SSD",
         "price": 0.79,
         "is_audited":"True",
-        "virtualization": false
+        "virtualization": true
     },
     {
         "id": "c-m-856zysgm",
@@ -21,7 +21,7 @@
         "configuration":"6 Core Intel i9-13900ks CPU, 256GB DDR5 Ram, 500G Bandwith, 50TB SSD",
         "price": 0.2,
         "is_audited":"True",
-        "virtualization": false
+        "virtualization": true
     },
     {
         "id": "c-m-grty0102",
@@ -29,7 +29,7 @@
         "configuration":"6 Core Intel i7-12700k CPU, 128GB DDR4 Ram, 100G Bandwith, 10TB SSD",
         "price": 0.39,
         "is_audited":"True",
-        "virtualization": false
+        "virtualization": true
     },
     {
         "id": "c-m-998fhyfl",
@@ -37,7 +37,7 @@
         "configuration":"6 Core Intel i7-12700k CPU, 128GB DDR4 Ram, 100G Bandwith, 10TB SSD",
         "price": 0.39,
         "is_audited":"True",
-        "virtualization": false
+        "virtualization": true
     },
     {
         "id": "c-m-160imglk",
@@ -45,6 +45,6 @@
         "configuration":"6 Core Intel i7-12700k CPU, 128GB DDR4 Ram, 100G Bandwith, 10TB SSD",
         "price": 0.39,
         "is_audited":"True",
-        "virtualization": false
+        "virtualization": true
     }
 ]
