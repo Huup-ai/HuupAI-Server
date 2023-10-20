@@ -169,9 +169,26 @@ def getAllGPUCluster(request):
                 result_list.append(result_dict)
             return JsonResponse(result_list, safe=False)
         else:
+            CUR_DIR = Path(__file__).parent.absolute()
+            CLUSTER_PATH = CUR_DIR /'resources/clustersGPU.json'
+            # Read data from clustersCPU.json file
             with open(CLUSTER_PATH, 'r') as file:
-                result_list = json.load(file)
-            return JsonResponse(result_list, safe=False)
+                clusters_data = json.load(file)
+
+            for data in clusters_data:
+                Cluster.objects.update_or_create(
+                    item_id=data['item_id'],
+                    defaults={
+                        'region': data['region'],
+                        'configurations': data['configuration'],
+                        'price': data['price'],
+                        'gpu': data['gpu'],
+                        'is_audited':False
+                    }
+                )
+            clusters = Cluster.objects.all()
+            serializer = ClusterSerializer(clusters, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def getClusterByName(requrest,cluster_id):
