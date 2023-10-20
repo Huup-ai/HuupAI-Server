@@ -403,7 +403,7 @@ def VMCreate(request, cluster_id):
         return Response(res.content, status=res.status_code)
     
 @api_view(['POST'])
-def VMUpdate(request, cluster_id, vm_name, vm_namespace):
+def VMUpdate(request, cluster_id):
     #check if user is anthenticated
     if not request.user.is_authenticated:
         return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
@@ -412,6 +412,8 @@ def VMUpdate(request, cluster_id, vm_name, vm_namespace):
 
     if not serializer.is_valid():
         return Response(serializer.errors, status=400)
+    vm_name = serializer.validated_data['vm_name']
+    vm_namespace = serializer.validated_data['vm_namespace']
     action = serializer.validated_data['action']
 
     try:
