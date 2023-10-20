@@ -56,6 +56,7 @@ class StripeCustomer(models.Model):
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
     stripe_customer_id = models.CharField(max_length=255)
     stripe_payment = models.CharField(max_length=255, null=True, blank=True)
+    stripe_account = models.CharField(max_length=255, null=True, blank=True)
 
 class Cluster(models.Model):
     item_id = models.CharField(max_length=255, unique=True, default='null')

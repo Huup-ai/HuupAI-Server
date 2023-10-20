@@ -602,6 +602,8 @@ def pay_invoice(request, invoice_id):
         # Get the invoice to be paid
         invoice = Invoice.objects.get(invoice_id=invoice_id, user_id=request.user)
         stripe_customer = StripeCustomer.objects.get(user=request.user)
+        
+        stripe.api_key = STRIPE_API
         try:
             payment_intent = stripe.PaymentIntent.create(
                 amount=int(invoice.total_price * 100),  # Amount in cents
@@ -628,6 +630,7 @@ def pay_invoice(request, invoice_id):
 
 @api_view(['GET'])
 def provider_get_invoice(request):
+
     if not request.user.is_provider:
         return Response({'error':'User is not a provider, please use get_invoice api'})
     
@@ -640,6 +643,38 @@ def provider_get_invoice(request):
     } for invoice in invoices]
 
     return Response(data)
+
+@api_view(['POST'])
+def provider_pay_invoice(request):
+    if not request.user.is_provider:
+        return Response({'error':'User is not a provider, please use get_invoice api'})
+    try:
+        stripe_customer = StripeCustomer.objects.get(user=request.user)
+    except StripeCustomer.DoesNotExist:
+        return Response({'error': 'Stripe customer does not exist for the user'}, status=400)
+
+    if not stripe_customer.stripe_account:
+        return Response({'error': 'Bank account is not set for the user'}, status=400)
+    
+    invoices = Invoice.objects.select_related('instance').filter(instance__provider_id=request.user, is_paid = False)
+    total_price = sum([invoice.total_price for invoice in invoices])
+
+    stripe.api_key = STRIPE_API
+    # Create a payout to the provider's bank account
+    payout = stripe.Payout.create(
+        amount=int(total_price * 100),  # amount should be in cents
+        currency='usd',  # change this to the provider's bank account currency
+        destination=stripe_customer.stripe_account,
+    )
+
+    return Response({'status': 'success', 'payout_id': payout.id})
+
+
+
+
+
+
+
 
 ###################################   Web3 API    #####################################
 @api_view(['GET'])
@@ -717,11 +752,16 @@ def check_payment_auth(request):
 def set_stripe_data(request):
     user = request.user
     stripe_payment = request.data.get('stripe_payment')
-    if not stripe_payment:
-        return Response({'error': 'payment token is required'}, status=500)
+    stripe_account = request.data.get('stripe_account')  # bank account token
     stripe.api_key = STRIPE_API
-    user.payment_method = 'credit_card'
-    user.save()
+
+    if not stripe_payment and not stripe_account:
+        return Response({'error': 'Payment token or bank account token is required'}, status=400)
+
+    if stripe_payment:
+        user.payment_method = 'credit_card'
+        user.save()
+
     try:
         stripe_customer = StripeCustomer.objects.get(user=request.user)
     except StripeCustomer.DoesNotExist:
@@ -738,9 +778,9 @@ def set_stripe_data(request):
             stripe_customer_id=customer['id'],
             stripe_payment=stripe_payment
         )
-    print(stripe_payment)
+
     # Check whether the payment method needs to be updated
-    if stripe_customer.stripe_payment != stripe_payment and stripe_payment:
+    if stripe_payment and stripe_customer.stripe_payment != stripe_payment:
         # Attach the new payment method to the customer in Stripe
         try:
             stripe.PaymentMethod.attach(
@@ -753,7 +793,7 @@ def set_stripe_data(request):
                 invoice_settings={'default_payment_method': stripe_payment},
             )
         except:
-            return Response({'error':'Unable to update payment method, use test card and try again'}, status=400)
+            return Response({'error': 'Unable to update payment method, use test card and try again'}, status=400)
         # Update the payment method in the local DB
         stripe_customer.stripe_payment = stripe_payment
         stripe_customer.save()
@@ -765,5 +805,10 @@ def set_stripe_data(request):
         # Store the last four digits to the User model's credit_card field
         user.credit_card = last_four
         user.save()
+
+    # Update bank account token
+    if stripe_account:
+        stripe_customer.stripe_account = stripe_account
+        stripe_customer.save()
 
     return JsonResponse({'status': 'success'}, status=200)
