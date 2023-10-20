@@ -15,7 +15,7 @@ def daily_billing():
     one_month_ago = today - timedelta(days=30)
     
     for user in User.objects.filter(invoice_date=one_month_ago):
-        instances = Instance.objects.filter(user_id=user)
+        instances = Instance.objects.filter(user_id=user).select_related('cluster')
 
         total_amount_to_charge = 0  # Initialize total amount to charge the user
         invoices = []  # List to store created invoices
