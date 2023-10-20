@@ -29,6 +29,7 @@ urlpatterns = [
     path('inventory/getsshkey/<str:cluster_id>/', getSshKey, name='get-ssh-key'),
     path('invoices/get_user_invoices/', get_invoices, name='get-invoices'),
     path('invoices/pay/<int:invoice_id>/', pay_invoice, name='pay-invoice'),
+    path('invoices/provider/pay/<int:invoice_id>/', provider_pay_invoice, name='provider-pay-invoice'),
     path('invoices/get_provider_invoices/', provider_get_invoice, name='get-provider-invoices'),
 
     path('invoices/check_payment_auth/', check_payment_auth, name='check-payment-auth'),

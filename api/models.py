@@ -100,6 +100,7 @@ class Invoice(models.Model):
     total_price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Total price including tax", null=True)
     user_id = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=True)
     paid = models.BooleanField(default=False)
+    provider_paid = models.BooleanField(default=False)
     
     def __str__(self):
         return f"Invoice {self.invoice_id}"

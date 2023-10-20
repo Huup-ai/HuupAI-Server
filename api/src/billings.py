@@ -63,7 +63,7 @@ def daily_billing():
                     customer=stripe_customer.stripe_customer_id,
                     payment_method=stripe_customer.stripe_payment
                 )
-                
+
                 # Check payment status and update invoices accordingly
                 if payment_intent.status == "succeeded":
                     for invoice in invoices:

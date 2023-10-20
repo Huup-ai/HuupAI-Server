@@ -634,7 +634,7 @@ def provider_get_invoice(request):
     if not request.user.is_provider:
         return Response({'error':'User is not a provider, please use get_invoice api'})
     
-    invoices = Invoice.objects.select_related('instance').filter(instance__provider_id=request.user, is_paid = False)
+    invoices = Invoice.objects.select_related('instance').filter(instance__provider_id=request.user, provider_paid = False)
     
     data = [{
         'vm_name': invoice.instance.vm_name,
@@ -647,32 +647,42 @@ def provider_get_invoice(request):
 @api_view(['POST'])
 def provider_pay_invoice(request):
     if not request.user.is_provider:
-        return Response({'error':'User is not a provider, please use get_invoice api'})
+        return Response({'error': 'User is not a provider, please use get_invoice api'})
+
+    invoice_id = request.data.get('invoice_id')
+    if not invoice_id:
+        return Response({'error': 'Invoice ID is required'}, status=400)
+
+    try:
+        invoice = Invoice.objects.get(id=invoice_id, instance__provider_id=request.user, provider_paid=False)
+    except Invoice.DoesNotExist:
+        return Response({'error': 'Invoice not found or already paid'}, status=404)
+
+    total_price = invoice.total_price
+
     try:
         stripe_customer = StripeCustomer.objects.get(user=request.user)
     except StripeCustomer.DoesNotExist:
-        return Response({'error': 'Stripe customer does not exist for the user'}, status=400)
-
-    if not stripe_customer.stripe_account:
-        return Response({'error': 'Bank account is not set for the user'}, status=400)
-    
-    invoices = Invoice.objects.select_related('instance').filter(instance__provider_id=request.user, is_paid = False)
-    total_price = sum([invoice.total_price for invoice in invoices])
+        return Response({'error': 'Stripe customer not found'}, status=404)
 
     stripe.api_key = STRIPE_API
-    # Create a payout to the provider's bank account
-    payout = stripe.Payout.create(
-        amount=int(total_price * 100),  # amount should be in cents
-        currency='usd',  # change this to the provider's bank account currency
-        destination=stripe_customer.stripe_account,
-    )
 
-    return Response({'status': 'success', 'payout_id': payout.id})
+    # Create a payout
+    try:
+        payout = stripe.Payout.create(
+            amount=int(total_price * 100),  # convert to cents
+            currency='usd',
+            method='instant',
+            destination=stripe_customer.stripe_account
+        )
+    except stripe.error.StripeError as e:
+        return Response({'error': str(e)}, status=400)
 
+    # Update the provider_paid field
+    invoice.provider_paid = True
+    invoice.save()
 
-
-
-
+    return Response({'status': 'success', 'payout_id': payout.id}, status=200)
 
 
 
@@ -748,11 +758,10 @@ def check_payment_auth(request):
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
 def set_stripe_data(request):
     user = request.user
     stripe_payment = request.data.get('stripe_payment')
-    stripe_account = request.data.get('stripe_account')  # bank account token
+    stripe_account = request.data.get('stripe_account')
     stripe.api_key = STRIPE_API
 
     if not stripe_payment and not stripe_account:
