@@ -93,6 +93,7 @@ def getAllCluster(request):
                 result_list.append(result_dict)
             return JsonResponse(result_list, safe=False)
         else:
+            Cluster.objects.all().delete()
             CUR_DIR = Path(__file__).parent.absolute()
             CLUSTER_PATH = CUR_DIR /'resources/clustersCPU.json'
             # Read data from clustersCPU.json file
@@ -169,6 +170,7 @@ def getAllGPUCluster(request):
                 result_list.append(result_dict)
             return JsonResponse(result_list, safe=False)
         else:
+            Cluster.objects.all().delete()
             CUR_DIR = Path(__file__).parent.absolute()
             CLUSTER_PATH = CUR_DIR /'resources/clustersGPU.json'
             # Read data from clustersCPU.json file
