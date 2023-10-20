@@ -1,42 +1,42 @@
 [
     {
-        "id": "c-m-889dmgrg",
+        "id": "c-m-ymikld32",
         "region": "suzhou",
         "configuration":"6 Core Intel i7-12700k CPU, 128GB DDR4 Ram, 100G Bandwith, 10TB SSD",
         "gpu": "1* NvidiaV100(80G)",
-        "price": 0.0039,
+        "price": 0.39,
         "is_audited":"nonaudited"
     },
     {
-        "id": "c-m-96b6k68z",
+        "id": "c-m-38d6hl29",
         "region": "suzhou",
         "configuration":"26 Core Intel i9-13900ks CPU, 128GB DDR4 Ram, 100G Bandwith, 10TB SSD",
         "gpu": "1* NvidiaV100(80G)",
-        "price": 0.0042,
+        "price": 0.42,
         "is_audited":"nonaudited"
     },
     {
-        "id": "c-m-ffrv4wlj",
+        "id": "c-m-39dnj98f",
         "region": "suzhou",
         "configuration":"26 Core Intel i7-12700k CPU, 128GB DDR4 Ram, 100G Bandwith, 10TB SSD",
         "gpu": "4*NvidiaA100(80G)",
-        "price": 0.0025,
+        "price": 0.95,
         "is_audited":"audited"
     },
     {
-        "id": "c-m-ewvv4wlj",
+        "id": "c-m-k83bg63",
         "region": "suzhou",
         "configuration":"26 Core Intel i7-12700k CPU, 128GB DDR4 Ram, 100G Bandwith, 20TB SSD",
         "gpu": "4*NvidiaA100(80G)",
-        "price": 0.0025,
+        "price": 0.5,
         "is_audited":"audited"
     },
     {
-        "id": "c-m-ed8grsj",
+        "id": "c-m-cm98nfg7",
         "region": "suzhou",
         "configuration":"26 Core Intel i7-12700k CPU, 128GB DDR4 Ram, 100G Bandwith, 20TB SSD",
         "gpu": "4*NvidiaA100(80G)",
-        "price": 0.0025,
+        "price": 0.5,
         "is_audited":"audited"
     }
 ]
