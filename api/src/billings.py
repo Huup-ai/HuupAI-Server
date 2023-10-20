@@ -9,7 +9,7 @@ import stripe
 
 
 def daily_billing():
-    stripe.api_key = 'your_secret_key'  # Set your Stripe secret key
+    stripe.api_key = 'sk_test_51NT86tLM79TglgywZ5DMu5q9nOyWvxzDLbdqLOeAClOAYRa823nz347d4kiNJ6TbTCLL03MQYlGllK0ooGZHcdAG00H48pWjm0'  # Set your Stripe secret key
 
     today = timezone.now().date()
     one_month_ago = today - timedelta(days=30)
