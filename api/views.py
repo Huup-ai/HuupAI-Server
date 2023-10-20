@@ -191,7 +191,7 @@ def getAllGPUCluster(request):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
-def getClusterByName(requrest,cluster_id):
+def getClusterByName(request,cluster_id):
     try:
         res = requests.get(f"https://edgesphere.szsciit.com/v1/management.cattle.io.clusters/{cluster_id}",cookies=COOKIES,headers={}, verify=CERT)
         if 200 <= res.status_code <= 299:
