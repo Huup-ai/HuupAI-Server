@@ -30,7 +30,7 @@ def daily_billing():
 
                     usage_hours = round(new_usage, 2)
                     tax = user.tax
-                    total_price = round(instance.cluster.price * usage_hours + tax, 2)
+                    total_price = round(instance.price * usage_hours + tax, 2)
                     total_amount_to_charge += total_price  # Accumulate the amount
                     
                     # Create an invoice with this data
@@ -38,7 +38,7 @@ def daily_billing():
                         user=user,
                         instance=instance,
                         invoice_time=timezone.now(),
-                        price=instance.cluster.price,
+                        price=instance.price,
                         usage=usage_hours,
                         tax=tax,
                         total_price=total_price,

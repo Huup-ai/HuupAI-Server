@@ -83,6 +83,7 @@ class Instance(models.Model):
     vm_name = models.CharField(max_length=100, unique=True, null=False)
     vm_namespace = models.CharField(max_length=100, blank=True, null=True)
     status = models.CharField(max_length=100)
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     start_time = models.DateTimeField(blank=True, null=True)
     stop_time = models.DateTimeField(blank=True, null=True)
     usage = models.FloatField(blank=True, null=True)

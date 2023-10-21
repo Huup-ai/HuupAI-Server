@@ -50,6 +50,7 @@ def start_instance(user, spec, cluster_id):
         'start_time': timezone.now(),
         'cluster': cluster_id,
         'usage': 0.0,
+        'price': price,
         }
     # Merging two dictionaries
     data = {**unique_data, **defaults}
