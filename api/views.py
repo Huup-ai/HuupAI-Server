@@ -110,7 +110,7 @@ def getAllCluster(request):
                         'is_audited':data['is_audited']
                     }
                 )
-            clusters = Cluster.objects.all()
+            clusters = clusters = Cluster.objects.filter(gpu__isnull=True)
             serializer = ClusterSerializer(clusters, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -186,7 +186,7 @@ def getAllGPUCluster(request):
                         'is_audited':data['is_audited']
                     }
                 )
-            clusters = Cluster.objects.all()
+            clusters = Cluster.objects.filter(gpu__isnull=False)
             serializer = ClusterSerializer(clusters, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
