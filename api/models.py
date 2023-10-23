@@ -66,7 +66,7 @@ class Cluster(models.Model):
     pods = models.CharField(max_length=255, null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     provider = models.ForeignKey(User, on_delete=models.CASCADE,null=True)
-    virtualization = models.BooleanField(default=False)
+    virtualization = models.BooleanField(default=True)
     is_audited = models.BooleanField(default=False)
     gpu = models.CharField(max_length=255, null=True, blank=True)  # GPU field
     configuration = models.TextField(null=True, blank=True)  # Configurations field
