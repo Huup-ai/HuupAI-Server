@@ -34,11 +34,13 @@ from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from pathlib import Path
+
 from tencentcloud.common import credential
+from tencentcloud.common.profile.client_profile import ClientProfile
+from tencentcloud.common.profile.http_profile import HttpProfile
 from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentCloudSDKException
 from tencentcloud.cvm.v20170312 import cvm_client, models
-
-from pathlib import Path
 
 ###################################   Cluster API   #####################################
 @api_view(['GET'])
@@ -734,41 +736,280 @@ def set_stripe_data(request):
 
     return JsonResponse({'status': 'success'}, status=200)
 
+#创建实例
 @api_view(['GET'])
-def start_cvm(request):
-    # 配置腾讯云认证信息
-    cred = credential.Credential("YourSecretId", "YourSecretKey")
-
+@permission_classes([AllowAny])
+def create_and_start_cvm(request):
+    cred = credential.Credential("IKIDnY7XlkW3PYUEk260g7JH2lOo24taAXfZ", "jGdmhNuPkqiLwKUP5XmocCXdZIn6CJGy")
     try:
-        # 创建 Cvm 实例
-        client = cvm_client.CvmClient(cred, "ap-guangzhou")
+    # 配置腾讯云认证信息
+    # 实例化一个http选项，可选的，没有特殊需求可以跳过
+        httpProfile = HttpProfile()
+        httpProfile.endpoint = "cvm.na-ashburn.tencentcloudapi.com"
+
+        # 实例化一个client选项，可选的，没有特殊需求可以跳过
+        clientProfile = ClientProfile()
+        clientProfile.httpProfile = httpProfile
+        # 实例化要请求产品的client对象,clientProfile是可选的
+        client = cvm_client.CvmClient(cred, "na-ashburn", clientProfile)
+        #这里的"na-ashburn"是 弗吉尼亚 （美东server）
+
+        # 实例化一个请求对象,每个接口都会对应一个request对象
         req = models.RunInstancesRequest()
         params = {
-            # ...  # 这里填写你的 Cvm 创建参数，参考之前的例子
+            "InstanceChargeType": "POSTPAID_BY_HOUR",
+            "DisableApiTermination": False,
+            "Placement": {
+                "Zone": "na-ashburn-1",
+                "ProjectId": 0
+            },#这里的"na-ashburn"是 弗吉尼亚 （美东server）
+            "VirtualPrivateCloud": {
+                "AsVpcGateway": False,
+                "VpcId": "DEFAULT",
+                "SubnetId": "DEFAULT"
+            },
+            "InstanceType": "S2.MEDIUM2",
+            "ImageId": "img-eb30mz89",
+            "SystemDisk": {
+                "DiskSize": 50,
+                "DiskType": "CLOUD_BSSD"
+            },
+            "InternetAccessible": {
+                "InternetMaxBandwidthOut": 5,
+                "PublicIpAssigned": True,
+                "InternetChargeType": "TRAFFIC_POSTPAID_BY_HOUR"
+            },
+            "LoginSettings": {
+                "KeyIds": [ "skey-kl82m9sl" ]
+            },
+            "InstanceCount": 1,
+            "EnhancedService": {
+                "SecurityService": {
+                    "Enabled": True
+                },
+                "MonitorService": {
+                    "Enabled": True
+                },
+                "AutomationService": {
+                    "Enabled": False
+                }
+            }
         }
         req.from_json_string(json.dumps(params))
-        resp = client.RunInstances(req)
 
-        return JsonResponse({"message": "Cvm 创建成功！"})
+        # 返回的resp是一个RunInstancesResponse的实例，与请求对象对应
+        resp = client.RunInstances(req)
+        # 输出json格式的字符串回包
+        return JsonResponse({'status': 'success','message':resp.to_json_string()}, status=200)
     except TencentCloudSDKException as err:
         return JsonResponse({"error": str(err)})
 
-@api_view(['POST'])
-def stop_cvm(request):
-    # 配置腾讯云认证信息
-    cred = credential.Credential("YourSecretId", "YourSecretKey")
-
+#查看实例列表
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def check_cvm(request): 
     try:
-        # 关闭 Cvm 实例
-        client = cvm_client.CvmClient(cred, "ap-guangzhou")
-        req = models.StopInstancesRequest()
+        # 实例化一个认证对象，入参需要传入腾讯云账户 SecretId 和 SecretKey，此处还需注意密钥对的保密
+        # 代码泄露可能会导致 SecretId 和 SecretKey 泄露，并威胁账号下所有资源的安全性。密钥可前往官网控制台 https://console.tencentcloud.com/capi 进行获取
+        cred = credential.Credential("IKIDnY7XlkW3PYUEk260g7JH2lOo24taAXfZ", "jGdmhNuPkqiLwKUP5XmocCXdZIn6CJGy")
+        # 实例化一个http选项，可选的，没有特殊需求可以跳过
+        httpProfile = HttpProfile()
+        httpProfile.endpoint = "cvm.tencentcloudapi.com"
+
+        # 实例化一个client选项，可选的，没有特殊需求可以跳过
+        clientProfile = ClientProfile()
+        clientProfile.httpProfile = httpProfile
+        # 实例化要请求产品的client对象,clientProfile是可选的
+        client = cvm_client.CvmClient(cred, "na-ashburn", clientProfile)
+
+        # 实例化一个请求对象,每个接口都会对应一个request对象
+        req = models.DescribeInstancesRequest()
+        params = {}
+            
+            #"InstanceIds": [
+            #    None
+            #],
+            #"Filters": [
+            #    {
+            #        "Name": None,
+            #        "Values": [
+            #            None
+            #        ]   
+            #    }
+            #],
+            #"Offset": None,
+            #"Limit": None
+            #"""
+        
+        
+        req.from_json_string(json.dumps(params))
+
+        # 返回的resp是一个DescribeInstancesResponse的实例，与请求对象对应
+        resp = client.DescribeInstances(req)
+        # 输出json格式的字符串回包
+        return JsonResponse({'status': 'success','message':resp.to_json_string()}, status=200)
+
+    except TencentCloudSDKException as err:
+        return JsonResponse({"error": str(err)})
+
+#更新实例
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def update_cvm(request):
+    try:
+        # 实例化一个认证对象，入参需要传入腾讯云账户 SecretId 和 SecretKey，此处还需注意密钥对的保密
+        # 代码泄露可能会导致 SecretId 和 SecretKey 泄露，并威胁账号下所有资源的安全性。密钥可前往官网控制台 https://console.tencentcloud.com/capi 进行获取
+        cred = credential.Credential("SecretId", "SecretKey")
+        # 实例化一个http选项，可选的，没有特殊需求可以跳过
+        httpProfile = HttpProfile()
+        httpProfile.endpoint = "cvm.tencentcloudapi.com"
+
+        # 实例化一个client选项，可选的，没有特殊需求可以跳过
+        clientProfile = ClientProfile()
+        clientProfile.httpProfile = httpProfile
+        # 实例化要请求产品的client对象,clientProfile是可选的
+        client = cvm_client.CvmClient(cred, "na-ashburn", clientProfile)
+
+        # 实例化一个请求对象,每个接口都会对应一个request对象
+        req = models.ModifyInstancesAttributeRequest()
         params = {
-            "InstanceIds": ["YourInstanceId"],  # 你的 Cvm 实例 ID
-            "ForceStop": True  # 是否强制关闭
+            "InstanceIds": [
+                None
+            ],
+            "InstanceName": None,
+            "SecurityGroups": [
+                None
+            ],
+            "CamRoleName": None,
+            "HostName": None,
+            "DisableApiTermination": None,
+            "CamRoleType": None
         }
         req.from_json_string(json.dumps(params))
-        resp = client.StopInstances(req)
 
-        return JsonResponse({"message": "Cvm 关闭成功！"})
+        # 返回的resp是一个ModifyInstancesAttributeResponse的实例，与请求对象对应
+        resp = client.ModifyInstancesAttribute(req)
+        # 输出json格式的字符串回包
+        return JsonResponse({'status': 'success','message':resp.to_json_string()}, status=200)
+
+    except TencentCloudSDKException as err:
+        return JsonResponse({"error": str(err)})
+
+#关闭实例
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def stop_cvm(request):
+    # 配置腾讯云认证信息
+    try:
+        # 实例化一个认证对象，入参需要传入腾讯云账户 SecretId 和 SecretKey，此处还需注意密钥对的保密
+        # 代码泄露可能会导致 SecretId 和 SecretKey 泄露，并威胁账号下所有资源的安全性。密钥可前往官网控制台 https://console.tencentcloud.com/capi 进行获取
+        cred = credential.Credential("IKIDnY7XlkW3PYUEk260g7JH2lOo24taAXfZ", "jGdmhNuPkqiLwKUP5XmocCXdZIn6CJGy")
+        # 实例化一个http选项，可选的，没有特殊需求可以跳过
+        httpProfile = HttpProfile()
+        httpProfile.endpoint = "cvm.tencentcloudapi.com"
+
+        # 实例化一个client选项，可选的，没有特殊需求可以跳过
+        clientProfile = ClientProfile()
+        clientProfile.httpProfile = httpProfile
+        # 实例化要请求产品的client对象,clientProfile是可选的
+        client = cvm_client.CvmClient(cred, "na-ashburn", clientProfile)
+
+        # 实例化一个请求对象,每个接口都会对应一个request对象
+        req = models.StopInstancesRequest()
+        params = {
+            "InstanceIds": [
+                "ins-l38z0o1h",
+                "ins-acqj6enl",
+                "ins-j0i43usx",
+                "ins-2yuqwfy7",
+            ],
+            "ForceStop": True,
+        }
+        req.from_json_string(json.dumps(params))
+
+        # 返回的resp是一个StopInstancesResponse的实例，与请求对象对应
+        resp = client.StopInstances(req)
+        # 输出json格式的字符串回包
+        return JsonResponse({'status': 'success','message':resp.to_json_string()}, status=200)
+
+    except TencentCloudSDKException as err:
+        return JsonResponse({"error": str(err)})
+    
+
+#启动实例
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def start_cvm(request):
+    try:
+        # 实例化一个认证对象，入参需要传入腾讯云账户 SecretId 和 SecretKey，此处还需注意密钥对的保密
+        # 代码泄露可能会导致 SecretId 和 SecretKey 泄露，并威胁账号下所有资源的安全性。密钥可前往官网控制台 https://console.tencentcloud.com/capi 进行获取
+        cred = credential.Credential("IKIDnY7XlkW3PYUEk260g7JH2lOo24taAXfZ", "jGdmhNuPkqiLwKUP5XmocCXdZIn6CJGy")
+        # 实例化一个http选项，可选的，没有特殊需求可以跳过
+        httpProfile = HttpProfile()
+        httpProfile.endpoint = "cvm.tencentcloudapi.com"
+
+        # 实例化一个client选项，可选的，没有特殊需求可以跳过
+        clientProfile = ClientProfile()
+        clientProfile.httpProfile = httpProfile
+        # 实例化要请求产品的client对象,clientProfile是可选的
+        client = cvm_client.CvmClient(cred, "na-ashburn", clientProfile)
+
+        # 实例化一个请求对象,每个接口都会对应一个request对象
+        req = models.StartInstancesRequest()
+        params = {
+            "InstanceIds": [
+                None
+            ]
+        }
+        req.from_json_string(json.dumps(params))
+
+        # 返回的resp是一个StartInstancesResponse的实例，与请求对象对应
+        resp = client.StartInstances(req)
+        # 输出json格式的字符串回包
+        return JsonResponse({'status': 'success','message':resp.to_json_string()}, status=200)
+
+    except TencentCloudSDKException as err:
+        return JsonResponse({"error": str(err)})
+
+#删除、退还实例
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def delete_cvm(request):
+    try:
+        # 实例化一个认证对象，入参需要传入腾讯云账户 SecretId 和 SecretKey，此处还需注意密钥对的保密
+        # 代码泄露可能会导致 SecretId 和 SecretKey 泄露，并威胁账号下所有资源的安全性。密钥可前往官网控制台 https://console.tencentcloud.com/capi 进行获取
+        cred = credential.Credential("IKIDnY7XlkW3PYUEk260g7JH2lOo24taAXfZ", "jGdmhNuPkqiLwKUP5XmocCXdZIn6CJGy")
+        # 实例化一个http选项，可选的，没有特殊需求可以跳过
+        httpProfile = HttpProfile()
+        httpProfile.endpoint = "cvm.tencentcloudapi.com"
+
+        # 实例化一个client选项，可选的，没有特殊需求可以跳过
+        clientProfile = ClientProfile()
+        clientProfile.httpProfile = httpProfile
+        # 实例化要请求产品的client对象,clientProfile是可选的
+        client = cvm_client.CvmClient(cred, "na-ashburn", clientProfile)
+
+        # 实例化一个请求对象,每个接口都会对应一个request对象
+        req = models.TerminateInstancesRequest()
+        params = {
+            "InstanceIds": [
+                "ins-6d6g2jsp",
+                "ins-bzfqx1mh",
+                "ins-hbr1jxo1",
+                "ins-187el9dd",
+                "ins-dxrunfn7",
+                "ins-gkxi33g3",
+                "ins-hjpf70dz",
+                "ins-1sxs6w7v",
+                "ins-ddipedcp",
+            ],
+            #"ReleasePrepaidDataDisks": null
+        }
+        req.from_json_string(json.dumps(params))
+
+        # 返回的resp是一个TerminateInstancesResponse的实例，与请求对象对应
+        resp = client.TerminateInstances(req)
+        # 输出json格式的字符串回包
+        return JsonResponse({'status': 'success','message':resp.to_json_string()}, status=200)
     except TencentCloudSDKException as err:
         return JsonResponse({"error": str(err)})
