@@ -296,7 +296,7 @@ def getAllUsage(request):
 
     result_list = [
         {
-            'instance_id': i.id, 
+            'instance_id': i.instance_id, 
             'usage': i.usage, 
             'cluster': {
                 'item_id': i.cluster.item_id,
