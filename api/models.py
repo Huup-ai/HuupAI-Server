@@ -43,7 +43,7 @@ class User(AbstractUser):
     address = models.TextField(blank=True, null=True)
     payment_method = models.CharField(max_length=50, blank=True, null=True)
     credit_card = models.CharField(max_length=4, blank=True, null=True)
-    routing_number = models.CharField(max_length=9, blank=True, null=True)
+    #routing_number = models.CharField(max_length=9, blank=True, null=True)
     tax = models.FloatField(blank=True, null=True)
     role = models.CharField(max_length=255, blank=True, null=True)
     token = models.CharField(max_length=255, blank=True, null=True)

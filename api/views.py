@@ -30,6 +30,10 @@ import stripe
 import json
 import requests
 import os
+from datetime import datetime
+from reportlab.pdfgen import canvas
+from io import BytesIO
+
 # DELETE THIS IN PRODUCTION USE
 COOKIES = {
     'R_SESS': 'token-test01:62fwdpv2npks9vb4qbcjstzkrl98m6zc68tqrdmdkrdr4hjmtf98fz'}
@@ -675,11 +679,43 @@ def get_invoices(request):
         # Get all the invoices for the authenticated user
         invoices = Invoice.objects.filter(user_id=request.user, paid=False)
 
+        # Create a PDF document
+        pdf_filename = "example.pdf"
+        document_title = "Sample PDF Document"
+        pdf_buffer = BytesIO()
+        # Create a canvas
+        pdf_canvas = canvas.Canvas(pdf_filename)
+
+        # Set document title
+        pdf_canvas.setTitle(document_title)
+
+        # Add content to the PDF
+        pdf_canvas.drawString(100, 750, "Hello, this is a sample PDF document.")
+        pdf_canvas.drawString(100, 700, "You can add more content here.")
+
+        # Save the PDF file
+        pdf_canvas.save()
+
         # Serialize the invoice data
-        serializer = InvoiceSerializer(invoices, many=True)
+        serializer = InvoiceSerializer(invoices,many=True)
+
+        # 获取 PDF 内容
+        pdf_content = pdf_buffer.getvalue()
+        pdf_buffer.close()
+
+        # 将 PDF 保存到一个临时文件中
+        temp_pdf_path = 'temp.pdf'
+        with open(temp_pdf_path, 'wb') as temp_pdf:
+            temp_pdf.write(pdf_content)
+
+        # Combine the serialized data and PDF content into a dictionary
+        response_data = {
+            'pdf': open(temp_pdf_path, 'rb'),
+            'invoice': serializer.data,
+        }
 
         # Return the serialized data in the response
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(response_data , status=status.HTTP_200_OK)
     except Invoice.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
