@@ -48,3 +48,4 @@ wcwidth==0.2.6
 zipp==3.16.2
 drf-yasg==1.21.7
 web3
+reportlab
