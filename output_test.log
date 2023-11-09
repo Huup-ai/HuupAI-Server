@@ -1,0 +1,104 @@
+nohup: ignoring input
+Starting server in TEST_MODE...
+Starting server in TEST_MODE...
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+October 17, 2023 - 03:09:11
+Django version 4.2.4, using settings 'dummy_api.settings'
+Starting development server at http://0.0.0.0:9000/
+Quit the server with CONTROL-C.
+
+[17/Oct/2023 03:09:58] "GET /admin/api/instance/ HTTP/1.1" 200 10098
+Not Found: /static/admin/css/base.css
+[17/Oct/2023 03:09:58] "GET /static/admin/css/base.css HTTP/1.1" 404 7330
+Not Found: /static/admin/css/dark_mode.css
+[17/Oct/2023 03:09:58] "GET /static/admin/css/dark_mode.css HTTP/1.1" 404 7345
+Not Found: /static/admin/css/nav_sidebar.css
+[17/Oct/2023 03:09:58] "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 404 7351
+Not Found: /static/admin/css/responsive.css
+[17/Oct/2023 03:09:58] "GET /static/admin/css/responsive.css HTTP/1.1" 404 7348
+Not Found: /static/admin/css/changelists.css
+[17/Oct/2023 03:09:58] "GET /static/admin/css/changelists.css HTTP/1.1" 404 7351
+[17/Oct/2023 03:09:58] "GET /admin/jsi18n/ HTTP/1.1" 200 3343
+Not Found: /static/admin/js/vendor/jquery/jquery.js
+[17/Oct/2023 03:09:58] "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 404 7372
+Not Found: /static/admin/js/jquery.init.js
+[17/Oct/2023 03:09:58] "GET /static/admin/js/jquery.init.js HTTP/1.1" 404 7345
+Not Found: /static/admin/js/core.js
+[17/Oct/2023 03:09:58] "GET /static/admin/js/core.js HTTP/1.1" 404 7324
+Not Found: /static/admin/js/admin/RelatedObjectLookups.js
+[17/Oct/2023 03:09:58] "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 404 7390
+Not Found: /static/admin/js/actions.js
+[17/Oct/2023 03:09:58] "GET /static/admin/js/actions.js HTTP/1.1" 404 7333
+Not Found: /static/admin/js/urlify.js
+[17/Oct/2023 03:09:58] "GET /static/admin/js/urlify.js HTTP/1.1" 404 7330
+[17/Oct/2023 03:09:58,957] - Broken pipe from ('67.168.144.18', 63538)
+Not Found: /static/admin/js/prepopulate.js
+[17/Oct/2023 03:09:58] "GET /static/admin/js/prepopulate.js HTTP/1.1" 404 7345
+Not Found: /static/admin/js/vendor/xregexp/xregexp.js
+[17/Oct/2023 03:09:59] "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 404 7378
+Not Found: /static/admin/js/theme.js
+[17/Oct/2023 03:09:59] "GET /static/admin/js/theme.js HTTP/1.1" 404 7327
+Not Found: /static/admin/js/nav_sidebar.js
+[17/Oct/2023 03:09:59] "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 404 7345
+Not Found: /static/admin/css/responsive.css
+[17/Oct/2023 03:09:59] "GET /static/admin/css/responsive.css HTTP/1.1" 404 7348
+Not Found: /static/admin/js/filters.js
+[17/Oct/2023 03:09:59] "GET /static/admin/js/filters.js HTTP/1.1" 404 7333
+[17/Oct/2023 03:10:01] "GET /admin/api/instance/ HTTP/1.1" 200 10098
+Not Found: /static/admin/css/nav_sidebar.css
+[17/Oct/2023 03:10:01] "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 404 7351
+Not Found: /static/admin/css/changelists.css
+[17/Oct/2023 03:10:01] "GET /static/admin/css/changelists.css HTTP/1.1" 404 7351
+Not Found: /static/admin/css/base.css
+[17/Oct/2023 03:10:01] "GET /static/admin/css/base.css HTTP/1.1" 404 7330
+Not Found: /static/admin/css/dark_mode.css
+[17/Oct/2023 03:10:01] "GET /static/admin/css/dark_mode.css HTTP/1.1" 404 7345
+Not Found: /static/admin/css/responsive.css
+[17/Oct/2023 03:10:01] "GET /static/admin/css/responsive.css HTTP/1.1" 404 7348
+[17/Oct/2023 03:10:01] "GET /admin/jsi18n/ HTTP/1.1" 200 3343
+Not Found: /static/admin/js/vendor/jquery/jquery.js
+[17/Oct/2023 03:10:01] "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 404 7372
+Not Found: /static/admin/js/jquery.init.js
+[17/Oct/2023 03:10:01] "GET /static/admin/js/jquery.init.js HTTP/1.1" 404 7345
+Not Found: /static/admin/js/admin/RelatedObjectLookups.js
+[17/Oct/2023 03:10:01] "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 404 7390
+Not Found: /static/admin/js/actions.js
+[17/Oct/2023 03:10:01] "GET /static/admin/js/actions.js HTTP/1.1" 404 7333
+Not Found: /static/admin/js/core.js
+[17/Oct/2023 03:10:01] "GET /static/admin/js/core.js HTTP/1.1" 404 7324
+Not Found: /static/admin/js/urlify.js
+[17/Oct/2023 03:10:01] "GET /static/admin/js/urlify.js HTTP/1.1" 404 7330
+Not Found: /static/admin/js/vendor/xregexp/xregexp.js
+[17/Oct/2023 03:10:01] "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 404 7378
+Not Found: /static/admin/js/prepopulate.js
+[17/Oct/2023 03:10:01] "GET /static/admin/js/prepopulate.js HTTP/1.1" 404 7345
+[17/Oct/2023 03:10:01,722] - Broken pipe from ('67.168.144.18', 63543)
+[17/Oct/2023 03:10:01,796] - Broken pipe from ('67.168.144.18', 63539)
+Not Found: /static/admin/js/theme.js
+[17/Oct/2023 03:10:01] "GET /static/admin/js/theme.js HTTP/1.1" 404 7327
+Not Found: /static/admin/js/nav_sidebar.js
+[17/Oct/2023 03:10:01] "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 404 7345
+Not Found: /static/admin/css/responsive.css
+[17/Oct/2023 03:10:01] "GET /static/admin/css/responsive.css HTTP/1.1" 404 7348
+Not Found: /static/admin/js/filters.js
+[17/Oct/2023 03:10:01] "GET /static/admin/js/filters.js HTTP/1.1" 404 7333
+[17/Oct/2023 03:10:05] "GET /admin HTTP/1.1" 301 0
+[17/Oct/2023 03:10:05] "GET /admin/ HTTP/1.1" 200 11058
+Not Found: /static/admin/css/dark_mode.css
+[17/Oct/2023 03:10:06] "GET /static/admin/css/dark_mode.css HTTP/1.1" 404 7345
+Not Found: /static/admin/css/nav_sidebar.css
+[17/Oct/2023 03:10:06] "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 404 7351
+Not Found: /static/admin/css/dashboard.css
+[17/Oct/2023 03:10:06] "GET /static/admin/css/dashboard.css HTTP/1.1" 404 7345
+[17/Oct/2023 03:10:06,726] - Broken pipe from ('67.168.144.18', 63548)
+Not Found: /static/admin/css/responsive.css
+[17/Oct/2023 03:10:06] "GET /static/admin/css/responsive.css HTTP/1.1" 404 7348
+Not Found: /static/admin/js/theme.js
+[17/Oct/2023 03:10:06] "GET /static/admin/js/theme.js HTTP/1.1" 404 7327
+Not Found: /static/admin/js/nav_sidebar.js
+[17/Oct/2023 03:10:06] "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 404 7345
+Not Found: /static/admin/css/base.css
+[17/Oct/2023 03:10:06] "GET /static/admin/css/base.css HTTP/1.1" 404 7330
