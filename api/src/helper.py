@@ -51,6 +51,7 @@ def start_instance(user, spec, cluster_id):
         'cluster': cluster_id,
         'usage': 0.0,
         'price': price,
+        'service':spec.get("service")
         }
     # Merging two dictionaries
     data = {**unique_data, **defaults}

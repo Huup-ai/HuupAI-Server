@@ -395,6 +395,7 @@ def VMCreate(request, cluster_id):
     spec = serializer.validated_data['spec']
     status_info = serializer.validated_data['status']
     payload = {'metadata': metadata, 'spec': spec, 'status': status_info}
+    metadata['service'] =  cluster.service
     # Create an instance in the database
     try:
         instance = start_instance(request.user, metadata, cluster)

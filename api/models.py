@@ -68,6 +68,7 @@ class Cluster(models.Model):
     pods = models.CharField(max_length=255, null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     provider = models.ForeignKey(User, on_delete=models.CASCADE,null=True)
+    service = models.CharField(max_length=255, null=True, blank=True)
     virtualization = models.BooleanField(default=True)
     is_audited = models.BooleanField(default=False)
     gpu = models.CharField(max_length=255, null=True, blank=True)  # GPU field
@@ -79,6 +80,7 @@ class Cluster(models.Model):
 class Instance(models.Model):
     instance_id = models.AutoField(primary_key=True)
     user_id = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='user_instances')
+    service = models.CharField(max_length=255, null=True, blank=True)
     provider_id = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='provider_instances', null=True, blank=True)
     payment_method = models.CharField(max_length=50, blank=True, null=True)
     cluster = models.ForeignKey(Cluster, on_delete=models.CASCADE)
