@@ -515,6 +515,7 @@ class UserRegistrationAPI(APIView):
             return Response({'message': 'User registered successfully'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class GoogleLoginView(APIView):
     def post(self, request, *args, **kwargs):
         token = request.data.get('token')
@@ -537,6 +538,7 @@ class GoogleLoginView(APIView):
         except ValueError:
             # Invalid token
             return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
