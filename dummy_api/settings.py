@@ -41,6 +41,7 @@ REST_FRAMEWORK = {
     ),
 }
 
+
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
@@ -73,6 +74,8 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
 }
 
+GOOGLE_OAUTH2_CLIENT_ID = '<Your-Google-Client-ID>'
+
 INSTALLED_APPS = [
     'rest_framework',
     'django.contrib.admin',
@@ -86,6 +89,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_yasg',
     'django_celery_beat',
+    'social_django',
 ]
 AUTH_USER_MODEL = 'api.User'
 

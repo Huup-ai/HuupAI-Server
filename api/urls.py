@@ -5,6 +5,8 @@ from .views import *
 
 urlpatterns = [
     path('users/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('users/google_login/', include('social_django.urls', namespace='social')),
+    # path('users/google/redirect/', Google_Redirect.as_view(), name='google-login-redirect'),
     path('users/login/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('users/register/', UserRegistrationAPI.as_view(), name='user-register'),
     path('provider/login/', ProviderLoginOrRegisterView.as_view(), name='provider-login'),

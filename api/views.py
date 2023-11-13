@@ -12,8 +12,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import AllowAny
 from django.conf import settings
 from django.db import transaction
-from rest_framework.exceptions import AuthenticationFailed
-from rest_framework.authentication import BaseAuthentication
+# from rest_framework.exceptions import AuthenticationFailed
+# from rest_framework.authentication import BaseAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import login, logout, authenticate
 from rest_framework.decorators import api_view, permission_classes
@@ -33,6 +33,8 @@ import os
 from datetime import datetime
 from reportlab.pdfgen import canvas
 from io import BytesIO
+from google.oauth2 import id_token
+from google.auth import transport
 
 # DELETE THIS IN PRODUCTION USE
 COOKIES = {
@@ -501,7 +503,7 @@ def VMTerminate(request, cluster_id, vm_name, vm_namespace):
         return Response({"error": "Failed to terminate VM in the cloud."}, status=status.HTTP_404_NOT_FOUND)
 
 ###################################   USER API    #####################################
-
+CLIENT_ID = settings.GOOGLE_OAUTH2_CLIENT_ID
 
 class UserRegistrationAPI(APIView):
     permission_classes = (permissions.AllowAny,)
@@ -513,6 +515,28 @@ class UserRegistrationAPI(APIView):
             return Response({'message': 'User registered successfully'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class GoogleLoginView(APIView):
+    def post(self, request, *args, **kwargs):
+        token = request.data.get('token')
+        try:
+            # Validate the token
+            idinfo = id_token.verify_oauth2_token(token, transport.requests.Request(), settings.GOOGLE_OAUTH2_CLIENT_ID)
+
+            # Extract user info
+            email = idinfo.get('email')
+
+            # Create or update user
+            user, created = User.objects.get_or_create(email=email)
+
+            # Generate JWT token
+            refresh = RefreshToken.for_user(user)
+            jwt_token = str(refresh.access_token)
+
+            return Response({'jwt_token': jwt_token}, status=status.HTTP_200_OK)
+        
+        except ValueError:
+            # Invalid token
+            return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
