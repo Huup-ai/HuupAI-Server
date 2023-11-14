@@ -74,7 +74,7 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
 }
 
-GOOGLE_OAUTH2_CLIENT_ID = '<Your-Google-Client-ID>'
+GOOGLE_OAUTH2_CLIENT_ID = '857153619993-12tmpju7pdq3oqoqvhvkg2iv7dr2i5qs.apps.googleusercontent.com'
 
 INSTALLED_APPS = [
     'rest_framework',
