@@ -3,7 +3,145 @@ from ..serializers import *
 from datetime import timedelta
 from django.utils import timezone
 import requests
+import boto3
+import platform
+import os
+from botocore.exceptions import ClientError
+import subprocess
 from django.core.exceptions import ObjectDoesNotExist
+
+def create_instances_helper(num_instances=1):
+    # ------ constants
+    keypair_name = 'create_ec2'
+    keypair_path = f'keys/{keypair_name}.pem'
+
+    # ------ find keypair
+    ec2_client = boto3.client('ec2')
+
+    # check if keypair exists on cloud
+    try:
+        # keypair exist on cloud
+        keypairs = ec2_client.describe_key_pairs(
+            KeyNames=[
+                keypair_name,
+            ],
+        )
+
+        # private key exist on local
+        if not os.path.isfile(keypair_path):
+            raise FileNotFoundError(f'{keypair_name} not found in keys')
+        return True
+    except ClientError as e:
+        print(e)
+        print('Creating keypair ...')
+
+        # ------ creating keypair
+        # create a file to store the key locally
+        outfile = open(keypair_path, 'w')
+
+        # call the boto ec2 function to create a key pair
+        key_pair = ec2_client.create_key_pair(KeyName=f'{keypair_name}')
+
+        # capture the key and store it in a file
+        print(key_pair)
+        KeyPairOut = str(key_pair['KeyMaterial'])
+        print(KeyPairOut)
+        outfile.write(KeyPairOut)
+
+        # ------ chmod 400 <keypair>.pem
+        system = platform.system()
+        if system == 'Windows':
+            # ---- constants
+            username = 'Edwar'
+
+            # windows commands for changing mode of a file
+            command = f'icacls "{keypair_path}" /inheritance:r /grant:r "{username}:R"'
+            try:
+                subprocess.run(command, check=True, shell=True)
+                print(f'Permissions updated for {keypair_path}')
+                return True
+            except subprocess.CalledProcessError as e:
+                print(f'Error updating permissions: {e}')
+        elif system == 'Linux':
+            # ---- constants
+            permission_value = 0o400
+
+            os.chmod(f'{keypair_path}', permission_value)
+            return True
+        else:
+            raise NameError('platform system unknown')
+
+    # ------ create ec2 instances
+    ec2 = boto3.resource('ec2')
+
+    # create a new EC2 instance
+    instances = ec2.create_instances(
+        ImageId='ami-0e83be366243f524a',  # details in AWS AMI catalog
+        MinCount=1,
+        MaxCount=num_instances,
+        InstanceType='t2.micro',
+        KeyName=f'{keypair_name}'
+    )
+
+    return instances
+def start_instance_helper(instance_id):
+    # ------ start instance
+    ec2_client = boto3.client('ec2')
+
+    # Do a dryrun first to verify permissions
+    try:
+        response = ec2_client.start_instances(
+            InstanceIds=[
+                instance_id
+            ],
+            DryRun=True
+        )
+    except ClientError as e:
+        if 'DryRunOperation' not in str(e):
+            raise
+
+    # Dry run succeeded, run start_instances
+    try:
+        response = ec2_client.start_instances(
+            InstanceIds=[
+                instance_id
+            ],
+            DryRun=False
+        )
+        print(response)
+        return True
+    except ClientError as e:
+        print(e)
+        return False
+
+def stop_instance_helper(instance_id):
+    # ------ stop instance
+    ec2_client = boto3.client('ec2')
+
+    # Do a dryrun first to verify permissions
+    try:
+        response = ec2_client.start_instances(
+            InstanceIds=[
+                instance_id
+            ],
+            DryRun=True
+        )
+    except ClientError as e:
+        if 'DryRunOperation' not in str(e):
+            raise
+
+    # Dry run succeeded, call stop_instances without dryrun
+    try:
+        response = ec2_client.stop_instances(
+            InstanceIds=[
+                instance_id
+            ],
+            DryRun=False
+        )
+        print(response)
+        return True
+    except ClientError as e:
+        print(e)
 
 def get_external_api_token(user):
     try:

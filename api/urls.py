@@ -26,8 +26,8 @@ urlpatterns = [
     path('instances/get_usage/', getAllUsage, name='get-usage'),
     
     path('instances/<str:cluster_id>/createvm/',VMCreate, name = 'vm-create'),
-    path('instances/<str:cluster_id>/updatevm/',VMUpdate, name = 'vm-update'),
-    path('instances/<str:cluster_id>/vmterminate/<str:vm_namespace>/<str:vm_name>/',VMTerminate, name = 'vm-terminate'),
+    path('instances/<str:instance_id>/updatevm/',VMUpdate, name = 'vm-update'),
+    path('instances/<str:instance_id>/vmterminate/',VMTerminate, name = 'vm-terminate'),
 
     path('inventory/getsshkey/<str:cluster_id>/', getSshKey, name='get-ssh-key'),
     path('invoices/get_user_invoices/', get_invoices, name='get-invoices'),

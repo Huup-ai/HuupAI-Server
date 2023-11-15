@@ -394,9 +394,6 @@ def VMCreate(request, cluster_id):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     metadata = serializer.validated_data['metadata']
-    spec = serializer.validated_data['spec']
-    status_info = serializer.validated_data['status']
-    payload = {'metadata': metadata, 'spec': spec, 'status': status_info}
     metadata['service'] =  cluster.service
     # Create an instance in the database
     try:
@@ -406,51 +403,36 @@ def VMCreate(request, cluster_id):
     try:
         # Try to make the API call if not in test mode
         if not settings.TEST_MODE:
-            res = requests.post(
-                f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/kubevirt.io.virtualmachine",
-                cookies=COOKIES,
-                json=payload,
-                verify=CERT
-            )
-            res.raise_for_status()
+            if cluster.service == 'amazon':
+                create_instances_helper()
+                start_instance_helper(instance.id)
             # If the API call was successful, return a success response
-            return Response(res.content, status=res.status_code)
+            return Response({'message':'instance created'})
         else:
             return Response({"message": "Instance has been created"}, status=status.HTTP_200_OK)
     except Exception as err:
         # If the API call was not successful, delete the database instance
         instance.delete()
-        return Response(res.content, status=res.status_code)
+        return Response(err)
 
 
 @api_view(['POST'])
-def VMUpdate(request, cluster_id):
+def VMUpdate(request,instance_id):
     # check if user is anthenticated
     if not request.user.is_authenticated:
         return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
 
-    serializer = VMUpdateSerializer(data=request.data)
-
-    if not serializer.is_valid():
-        return Response(serializer.errors, status=400)
-    vm_name = serializer.validated_data['vm_name']
-    vm_namespace = serializer.validated_data['vm_namespace']
-    action = serializer.validated_data['action']
-
+    action = 'stopped'
+    instance = Instance.objects.get(
+                user_id=request.user, instance_id=instance_id)
     try:
         if not settings.TEST_MODE:
-            res = requests.post(
-                f"https://edgesphere.szsciit.com/k8s/clusters/{cluster_id}/v1/kubevirt.io.virtualmachine/{vm_namespace}/{vm_name}?action={action}",
-                cookies=COOKIES,
-                json={"cluster_id": cluster_id, "action": action,
-                      "vmName": vm_name, "namespace": vm_namespace},
-                verify=CERT
-            )
+            if instance.service == 'amazon':
+                res = stop_instance_helper(instance_id)
+            else:
+                pass
 
-        if settings.TEST_MODE or res.status_code == 200:
-            # Retrieve the corresponding instance
-            instance = Instance.objects.get(
-                user_id=request.user, vm_name=vm_name)
+        if settings.TEST_MODE or res:
 
             # Update the instance using src helper function
             update_instance(instance, action)
@@ -466,7 +448,7 @@ def VMUpdate(request, cluster_id):
 
 
 @api_view(['POST'])
-def VMTerminate(request, cluster_id, vm_name, vm_namespace):
+def VMTerminate(request, instance_id):
     # First, ensure the user is authenticated
     if not request.user.is_authenticated:
         return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
@@ -474,24 +456,15 @@ def VMTerminate(request, cluster_id, vm_name, vm_namespace):
     try:
         # Check if the instance exists based on the vm_name, vm_namespace, and user.
         instance = Instance.objects.get(
-            vm_name=vm_name,
-            vm_namespace=vm_namespace,
-            user_id=request.user
+            user_id=request.user,
+            instance_id = instance_id
         )
 
-        # if instance exists, send the request to terminate the VM in the cloud
-        json = {'clusterid': cluster_id,
-                'vmName': vm_name, 'namespace': vm_namespace}
         if not settings.TEST_MODE:
-            res = requests.post(
-                f"wss://edgesphere.szsciit.com/wsproxy/k8s/clusters/{cluster_id}/apis/subresources.kubevirt.io/v1/namespaces/{vm_namespace}/virtualmachineinstances/{vm_name}/vnc",
-                cookies=COOKIES,
-                json=json,
-                verify=CERT
-            )
+            res = stop_instance_helper(instance.id)
 
         # If TEST_MODE or the request was successful, update the instance.
-        if settings.TEST_MODE or res.status_code == 200:
+        if settings.TEST_MODE or res:
             update_instance(instance, "terminated")
             return Response({"message": "Instance terminate successfully"}, status=status.HTTP_200_OK)
         else:
