@@ -52,7 +52,6 @@ class PricingSerializer(serializers.ModelSerializer):
 
 class VMCreateSerializer(serializers.Serializer):
     metadata = serializers.JSONField()
-    spec = serializers.JSONField()
     status = serializers.JSONField()
 
 class VMUpdateSerializer(serializers.Serializer):
