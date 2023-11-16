@@ -490,6 +490,7 @@ class UserRegistrationAPI(APIView):
 
 
 class GoogleLoginView(APIView):
+    permission_classes = (permissions.AllowAny,)
     def post(self, request, *args, **kwargs):
         token = request.data.get('token_id')
         try:
