@@ -413,7 +413,7 @@ def VMCreate(request, cluster_id):
     except Exception as err:
         # If the API call was not successful, delete the database instance
         instance.delete()
-        return Response(err)
+        return Response({"error": str(err)}, status=500)
 
 
 @api_view(['POST'])
@@ -511,7 +511,7 @@ class GoogleLoginView(APIView):
         
         except ValueError as e:
             # Invalid token
-            return Response(e)
+            return Response({"error": str(e)}, status=500)
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
