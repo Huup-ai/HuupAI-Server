@@ -509,9 +509,9 @@ class GoogleLoginView(APIView):
 
             return Response({'jwt_token': jwt_token}, status=status.HTTP_200_OK)
         
-        except ValueError:
+        except ValueError as e:
             # Invalid token
-            return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(e)
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
