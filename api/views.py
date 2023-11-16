@@ -492,7 +492,7 @@ class UserRegistrationAPI(APIView):
 class GoogleLoginView(APIView):
     permission_classes = (permissions.AllowAny,)
     def post(self, request, *args, **kwargs):
-        token = request.data.get('token_id')
+        token = request.data.get('token')
         try:
             # Validate the token
             idinfo = id_token.verify_oauth2_token(token, transport.requests.Request(), settings.GOOGLE_OAUTH2_CLIENT_ID)
